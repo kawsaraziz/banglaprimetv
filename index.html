@@ -9,31 +9,32 @@
         body, html { margin: 0; background: #050505; color: #ccc; font-family: sans-serif; height: 100%; overflow: hidden; display: flex; flex-direction: column; }
         
         /* হেডার */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 5px 20px; background: #0a0a0a; border-bottom: 1px solid #222; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 8px 20px; background: #0a0a0a; border-bottom: 1px solid #222; }
         .logo-img { width: 45px; height: 45px; border-radius: 50%; border: 1px solid #333; }
         
         /* ভিডিও ও ওয়াটারমার্ক */
         .player-container { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
         #videoPlayer { width: 100%; height: 100%; }
-        .watermark { position: absolute; font-size: 1.2rem; opacity: 0.3; pointer-events: none; z-index: 10; animation: move 20s linear infinite; }
+        .watermark { position: absolute; font-size: 1.5rem; opacity: 0.3; pointer-events: none; z-index: 10; animation: move 20s linear infinite; }
         @keyframes move { 0%, 100% { top: 10%; left: 10%; } 25% { top: 10%; left: 80%; } 50% { top: 80%; left: 80%; } 75% { top: 80%; left: 10%; } }
         
-        /* নিউজ টিকার */
-        .ticker-wrap { background: #0a0a0a; border-top: 1px solid #222; height: 28px; overflow: hidden; display: flex; align-items: center; }
+        /* নিউজ টিকার (প্লেয়ারের নিচে) */
+        .ticker-wrap { background: #0a0a0a; border-bottom: 1px solid #222; height: 30px; overflow: hidden; display: flex; align-items: center; }
         .ticker-text { white-space: nowrap; animation: scroll 15s linear infinite; font-size: 14px; color: #aaa; }
         @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
         
-        /* মেনু ও গ্রিড */
+        /* সাইড মেনু ও গ্রিড */
         .drawer { height: 100%; width: 0; position: fixed; z-index: 1000; top: 0; left: 0; background: #0a0a0a; transition: 0.3s; overflow-y: auto; border-right: 1px solid #222; }
         .trigger { position: fixed; left: 0; top: 0; width: 30px; height: 100%; z-index: 999; }
         .trigger:hover + .drawer, .drawer:hover { width: 250px; }
-        .drawer-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #1a1a1a; cursor: pointer; font-size: 13px; }
-        .active { background: #111; color: #00a8e1; border-left: 3px solid #00a8e1; }
+        .drawer-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #1a1a1a; cursor: pointer; font-size: 14px; }
+        .active { background: #111; color: #00a8e1; border-left: 4px solid #00a8e1; }
         
-        .grid { flex-grow: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 15px; overflow-y: auto; }
-        .card { background: #111; padding: 8px; text-align: center; border-radius: 5px; cursor: pointer; border: 1px solid #222; }
+        /* চ্যানেল কার্ড সাইজ বড় করা হয়েছে */
+        .grid { flex-grow: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; overflow-y: auto; }
+        .card { background: #111; padding: 12px; text-align: center; border-radius: 8px; cursor: pointer; border: 1px solid #222; transition: 0.2s; }
+        .card:hover { border-color: #00a8e1; }
         
-        /* একদম নিচে কপিরাইট */
         footer { background: #050505; text-align: center; padding: 10px; font-size: 11px; color: #333; margin-top: auto; }
     </style>
 </head>
@@ -41,7 +42,7 @@
 
 <div class="header">
     <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo-img">
-    <input type="text" id="search" placeholder="সার্চ..." onkeyup="search()" style="padding: 4px; background:#111; border:1px solid #222; color:#fff; border-radius:3px;">
+    <input type="text" id="search" placeholder="সার্চ..." onkeyup="search()" style="padding: 6px; background:#111; border:1px solid #222; color:#fff; border-radius:4px; width: 120px;">
 </div>
 
 <div class="player-container">
@@ -69,8 +70,8 @@
     });
 
     function render(d) {
-        document.getElementById('grid').innerHTML = d.map((c, i) => `<div class="card" onclick="play('${c.url}', ${i})"><img src="${c.logo}" width="35" style="border-radius:50%"><div style="font-size:9px; margin-top:5px;">${c.name}</div></div>`).join('');
-        document.getElementById('drawerList').innerHTML = d.map((c, i) => `<div class="drawer-item" id="c-${i}" onclick="play('${c.url}', ${i})"><img src="${c.logo}" width="25" style="margin-right:8px; border-radius:3px">${c.name}</div>`).join('');
+        document.getElementById('grid').innerHTML = d.map((c, i) => `<div class="card" onclick="play('${c.url}', ${i})"><img src="${c.logo}" width="50" style="border-radius:50%"><div style="font-size:11px; margin-top:5px;">${c.name}</div></div>`).join('');
+        document.getElementById('drawerList').innerHTML = d.map((c, i) => `<div class="drawer-item" id="c-${i}" onclick="play('${c.url}', ${i})"><img src="${c.logo}" width="30" style="margin-right:10px; border-radius:4px">${c.name}</div>`).join('');
     }
 
     function play(url, i) {

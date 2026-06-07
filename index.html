@@ -33,8 +33,8 @@
         @media (max-width: 768px) {
             body { overflow: auto; }
             .wrapper { flex-direction: column; height: auto; }
-            /* চ্যানেল লিস্টকে স্ক্রল টেক্সট এর উপরে আনা হয়েছে */
-            .channel-sidebar { order: -1; border-left: none; border-bottom: 1px solid #333; max-height: 300px; }
+            /* মোবাইল ভিউতে চ্যানেল লিস্টকে প্লেয়ারের নিচে আনা হয়েছে */
+            .channel-sidebar { order: 2; border-left: none; height: auto; overflow: visible; }
             .channel-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
             .channel-item { aspect-ratio: 1/1; flex-direction: column; justify-content: center; text-align: center; font-size: 10px; }
             .channel-logo { width: 50px; height: 50px; margin-bottom: 5px; }

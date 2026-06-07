@@ -9,37 +9,38 @@
     <style>
         body, html { margin: 0; background: #000; color: #fff; font-family: sans-serif; height: 100%; overflow: hidden; }
         
-        /* হেডার: লোগো বামে, সার্চ ডানে */
-        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background: #0f171e; }
-        .logo { width: 40px; height: 40px; border-radius: 50%; }
+        /* হেডার ও লোগো */
+        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0f171e; }
+        .logo { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #00a8e1; }
         
         /* ভিডিও ও ওয়াটারমার্ক */
         .player-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
         #videoPlayer { width: 100%; height: 100%; }
-        .watermark { position: absolute; top: 10%; left: 10%; font-size: 2vw; opacity: 0.4; pointer-events: none; z-index: 100; animation: moveScreen 20s linear infinite; }
-        @keyframes moveScreen { 0% { top: 10%; left: 10%; } 25% { top: 10%; left: 80%; } 50% { top: 80%; left: 80%; } 75% { top: 80%; left: 10%; } 100% { top: 10%; left: 10%; } }
+        .watermark { position: absolute; top: 10%; left: 10%; font-size: 2.5vw; opacity: 0.5; pointer-events: none; z-index: 100; animation: moveWatermark 15s linear infinite; }
+        @keyframes moveWatermark { 0% { top: 10%; left: 10%; } 25% { top: 10%; left: 80%; } 50% { top: 80%; left: 80%; } 75% { top: 80%; left: 10%; } 100% { top: 10%; left: 10%; } }
         
-        /* স্ক্রলিং টেক্সট ও ক্যাটাগরি */
-        .marquee-container { background: #0f171e; padding: 8px; border-top: 1px solid #00a8e1; font-size: 14px; }
+        /* মেনু ও ক্যাটাগরি */
+        .marquee-container { background: #00a8e1; color: #000; font-weight: bold; padding: 5px; }
         .category-scroll { display: flex; overflow-x: auto; background: #1a242f; padding: 10px; gap: 10px; }
-        .category-item { background: #00a8e1; padding: 5px 15px; border-radius: 20px; cursor: pointer; color: #000; font-weight: bold; white-space: nowrap; }
+        .category-item { background: #333; padding: 6px 16px; border-radius: 20px; cursor: pointer; border: 1px solid #00a8e1; }
         
         /* সাইড মেনু */
-        .trigger-area { position: fixed; left: 0; top: 0; width: 40px; height: 100%; z-index: 9999; }
-        .drawer { height: 100%; width: 0; position: fixed; z-index: 10000; top: 0; left: 0; background-color: #0f171e; transition: 0.4s; overflow-y: auto; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
+        .trigger-area { position: fixed; left: 0; top: 0; width: 50px; height: 100%; z-index: 9999; }
+        .drawer { height: 100%; width: 0; position: fixed; z-index: 10000; top: 0; left: 0; background-color: #0f171e; transition: 0.4s; overflow-y: auto; box-shadow: 3px 0 10px #000; }
         .trigger-area:hover + .drawer, .drawer:hover { width: 300px; }
-        .drawer-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #1a242f; cursor: pointer; }
+        .drawer-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #333; cursor: pointer; }
+        .active-channel { background: #00a8e1 !important; color: #000; }
         
         /* চ্যানেল গ্রিড */
-        .channel-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; height: calc(100vh - 280px); }
-        .channel-card { background: #0f171e; padding: 15px; text-align: center; border-radius: 10px; cursor: pointer; border: 1px solid #333; }
+        .channel-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; overflow-y: auto; height: 40vh; }
+        .channel-card { background: #1a242f; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; border: 1px solid #444; }
     </style>
 </head>
 <body>
 
 <div class="header-container">
     <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo">
-    <input type="text" id="searchBox" placeholder="🔍 সার্চ..." onkeyup="searchChannel()" style="padding: 6px; background: #1a242f; border:none; color:#fff; border-radius:5px;">
+    <input type="text" id="searchBox" placeholder="🔍 চ্যানেল সার্চ..." onkeyup="searchChannel()" style="padding: 8px; width: 200px; background: #1a242f; border:none; color:#fff; border-radius:5px;">
 </div>
 
 <div class="player-wrapper">
@@ -48,7 +49,7 @@
 </div>
 
 <div class="marquee-container">
-    <marquee scrollamount="5">স্বাগতম বাংলা প্রাইম টিভি-তে। অ্যারো কি (Arrow Key) ব্যবহার করে চ্যানেল পরিবর্তন করুন।</marquee>
+    <marquee>কপিরাইট © আজিজুল হক কাওসার। অ্যারো কি ব্যবহার করে চ্যানেল পরিবর্তন করুন।</marquee>
 </div>
 
 <div class="category-scroll" id="categoryBar"></div>
@@ -62,15 +63,13 @@
 <div class="channel-list" id="channelGrid"></div>
 
 <script>
-    let allChannels = [];
-    
-    fetch('channels.json')
-        .then(res => res.json())
-        .then(data => {
-            allChannels = data;
-            renderAll(data);
-            renderCategories(data);
-        });
+    let allChannels = [], currentIndex = 0;
+
+    fetch('channels.json').then(res => res.json()).then(data => {
+        allChannels = data;
+        renderAll(data);
+        renderCategories(data);
+    });
 
     function renderCategories(data) {
         const bar = document.getElementById('categoryBar');
@@ -86,35 +85,37 @@
     function renderAll(data) {
         const grid = document.getElementById('channelGrid');
         const drawer = document.getElementById('drawerContent');
-        
-        grid.innerHTML = data.map(ch => `
-            <div class="channel-card" onclick="playChannel('${ch.url}')">
+        grid.innerHTML = data.map((ch, i) => `
+            <div class="channel-card" onclick="playChannel('${ch.url}', ${i})">
                 <img src="${ch.logo}" style="width:50px; height:50px; border-radius:50%;">
-                <div style="font-size:12px; margin-top:5px;">${ch.name}</div>
+                <div style="font-size:11px; margin-top:5px;">${ch.name}</div>
             </div>`).join('');
-            
-        drawer.innerHTML = data.map(ch => `
-            <div class="drawer-item" onclick="playChannel('${ch.url}')">
+        drawer.innerHTML = data.map((ch, i) => `
+            <div class="drawer-item" id="ch-${i}" onclick="playChannel('${ch.url}', ${i})">
                 <img src="${ch.logo}" style="width:30px; height:30px; margin-right:10px; border-radius:4px;">
                 ${ch.name}
             </div>`).join('');
     }
 
-    function searchChannel() {
-        let input = document.getElementById('searchBox').value.toLowerCase();
-        let filtered = allChannels.filter(ch => ch.name.toLowerCase().includes(input));
-        renderAll(filtered);
-    }
-
-    function playChannel(url) {
+    function playChannel(url, index) {
+        currentIndex = index;
         const v = document.getElementById('videoPlayer');
         v.muted = false;
         if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(url);
-            hls.attachMedia(v);
-            v.play();
+            const hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); v.play();
         }
+        document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active-channel'));
+        document.getElementById(`ch-${index}`).classList.add('active-channel');
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowRight') playChannel(allChannels[(currentIndex + 1) % allChannels.length].url, (currentIndex + 1) % allChannels.length);
+        if(e.key === 'ArrowLeft') playChannel(allChannels[(currentIndex - 1 + allChannels.length) % allChannels.length].url, (currentIndex - 1 + allChannels.length) % allChannels.length);
+    });
+
+    function searchChannel() {
+        let input = document.getElementById('searchBox').value.toLowerCase();
+        renderAll(allChannels.filter(ch => ch.name.toLowerCase().includes(input)));
     }
 </script>
 </body>

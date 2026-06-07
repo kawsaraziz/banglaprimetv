@@ -9,44 +9,41 @@
         :root { --bg: #050505; --text: #fff; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
         
-        /* হেডার: কোণায় লোগো ও সার্চ */
-        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #333; background: var(--bg); flex-shrink: 0; z-index: 1000; }
-        .logo-box { font-size: 20px; font-weight: bold; color: #ff0000; }
-        .search-box { padding: 5px 15px; border-radius: 20px; border: 1px solid #333; background: #151515; color: #fff; width: 120px; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #333; flex-shrink: 0; }
+        .logo-box { font-weight: bold; color: #ff0000; }
+        .search-box { padding: 5px 15px; border-radius: 20px; border: 1px solid #333; background: #151515; color: #fff; width: 150px; }
         
-        /* মেইন কন্টেইনার */
         .wrapper { display: flex; flex: 1; overflow: hidden; }
         
-        /* বামপাশ: প্লেয়ার ও স্ক্রল বক্স স্থির */
-        .left-section { flex: 4; display: flex; flex-direction: column; padding: 10px; min-width: 0; }
+        /* বামপাশ: প্লেয়ার */
+        .left-section { flex: 3; padding: 15px; display: flex; flex-direction: column; }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; position: relative; }
-        #videoPlayer { width: 100%; height: 100%; display: block; }
+        #videoPlayer { width: 100%; height: 100%; object-fit: contain; }
         
-        /* ওয়াটারমার্ক: অ্যানিমেটেড */
-        .watermark { position: absolute; top: 10px; left: 10px; font-size: 20px; font-weight: bold; color: rgba(255, 255, 255, 0.2); animation: move 15s linear infinite; pointer-events: none; }
-        @keyframes move { 0% { transform: translate(0,0); } 50% { transform: translate(40vw, 20vh); } 100% { transform: translate(0,0); } }
+        /* ওয়াটারমার্ক */
+        .watermark { position: absolute; top: 10px; left: 10px; font-size: 1.5vw; color: rgba(255, 255, 255, 0.2); animation: move 15s linear infinite; pointer-events: none; z-index: 10; }
+        @keyframes move { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(40vw, 20vh); } }
 
-        /* স্ক্রল টেক্সট: চিকন ও গোলাকার */
-        .scroll-wrapper { margin-top: 8px; padding: 3px 15px; border: 1px solid #333; border-radius: 15px; background: #111; overflow: hidden; }
-        .scrolling-text { font-size: 12px; font-weight: 300; }
+        /* চিকন স্ক্রল বক্স */
+        .scroll-wrapper { margin-top: 10px; padding: 2px 10px; border: 1px solid #333; border-radius: 15px; background: #111; }
+        .scrolling-text { font-size: 11px; }
 
-        /* চ্যানেল লিস্ট: স্ক্রলযোগ্য ও স্কয়ার */
-        .channel-sidebar { flex: 1; min-width: 250px; overflow-y: auto; border-left: 1px solid #333; display: flex; flex-direction: column; }
-        .channel-list { padding: 10px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .channel-item { aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; border-radius: 10px; border: 1px solid #333; cursor: pointer; text-align: center; }
-        .channel-logo { width: 45%; aspect-ratio: 1/1; border-radius: 50%; margin-bottom: 5px; object-fit: cover; background: #333; }
+        /* চ্যানেল লিস্ট: ডেস্কটপে লিস্ট, মোবাইলে গ্রিড */
+        .channel-sidebar { flex: 1; min-width: 300px; border-left: 1px solid #333; overflow-y: auto; }
+        .channel-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .channel-item { display: flex; align-items: center; gap: 10px; padding: 8px; background: #111; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
+        .channel-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
 
-        /* পোর্ট্রেট ভিউ: মোবাইল অপ্টিমাইজেশন */
         @media (max-width: 768px) {
             body { overflow: auto; }
             .wrapper { flex-direction: column; height: auto; }
-            .left-section { position: sticky; top: 0; background: var(--bg); z-index: 999; padding-bottom: 0; }
-            .channel-list { grid-template-columns: repeat(3, 1fr); }
+            .channel-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .channel-item { aspect-ratio: 1/1; flex-direction: column; justify-content: center; text-align: center; font-size: 10px; }
+            .channel-logo { width: 50px; height: 50px; margin-bottom: 5px; }
         }
     </style>
 </head>
 <body>
-
     <div class="header">
         <div class="logo-box">📺 বাংলা প্রাইম</div>
         <input type="text" class="search-box" placeholder="সার্চ...">

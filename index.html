@@ -4,43 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bangla Prime TV</title>
-    <link rel="manifest" href="manifest.json">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         body, html { margin: 0; background: #000; color: #fff; font-family: sans-serif; height: 100%; overflow: hidden; }
         
-        /* হেডার ও লোগো */
-        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0f171e; }
-        .logo { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #00a8e1; }
+        /* হেডার: লোগো বামে, সার্চ ডানে */
+        .header-container { display: flex; justify-content: space-between; align-items: center; padding: 5px 15px; background: #0f171e; }
+        .logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #00a8e1; }
         
         /* ভিডিও ও ওয়াটারমার্ক */
-        .player-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
+        .player-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; }
         #videoPlayer { width: 100%; height: 100%; }
-        .watermark { position: absolute; top: 10%; left: 10%; font-size: 2.5vw; opacity: 0.5; pointer-events: none; z-index: 100; animation: moveWatermark 15s linear infinite; }
-        @keyframes moveWatermark { 0% { top: 10%; left: 10%; } 25% { top: 10%; left: 80%; } 50% { top: 80%; left: 80%; } 75% { top: 80%; left: 10%; } 100% { top: 10%; left: 10%; } }
+        .watermark { position: absolute; top: 10%; left: 10%; font-size: 2vw; opacity: 0.4; pointer-events: none; z-index: 100; animation: moveWatermark 20s linear infinite; }
+        @keyframes moveWatermark { 0% { top: 10%; left: 10%; } 50% { top: 80%; left: 80%; } 100% { top: 10%; left: 10%; } }
         
-        /* মেনু ও ক্যাটাগরি */
-        .marquee-container { background: #00a8e1; color: #000; font-weight: bold; padding: 5px; }
-        .category-scroll { display: flex; overflow-x: auto; background: #1a242f; padding: 10px; gap: 10px; }
-        .category-item { background: #333; padding: 6px 16px; border-radius: 20px; cursor: pointer; border: 1px solid #00a8e1; }
+        /* টিভি স্টাইল বিজ্ঞপ্তি */
+        .news-ticker { background: #d00; color: #fff; padding: 8px; font-weight: bold; overflow: hidden; white-space: nowrap; border-top: 2px solid #fff; }
         
         /* সাইড মেনু */
-        .trigger-area { position: fixed; left: 0; top: 0; width: 50px; height: 100%; z-index: 9999; }
-        .drawer { height: 100%; width: 0; position: fixed; z-index: 10000; top: 0; left: 0; background-color: #0f171e; transition: 0.4s; overflow-y: auto; box-shadow: 3px 0 10px #000; }
+        .trigger-area { position: fixed; left: 0; top: 0; width: 40px; height: 100%; z-index: 9999; }
+        .drawer { height: 100%; width: 0; position: fixed; z-index: 10000; top: 0; left: 0; background-color: #0f171e; transition: 0.4s; overflow-y: auto; }
         .trigger-area:hover + .drawer, .drawer:hover { width: 300px; }
-        .drawer-item { display: flex; align-items: center; padding: 12px; border-bottom: 1px solid #333; cursor: pointer; }
+        .drawer-item { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #333; cursor: pointer; }
         .active-channel { background: #00a8e1 !important; color: #000; }
         
         /* চ্যানেল গ্রিড */
-        .channel-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; padding: 15px; overflow-y: auto; height: 40vh; }
-        .channel-card { background: #1a242f; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; border: 1px solid #444; }
+        .channel-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; padding: 15px; overflow-y: auto; height: 35vh; }
+        .channel-card { background: #1a242f; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; }
+        
+        /* ফুটার */
+        footer { text-align: center; padding: 10px; font-size: 12px; color: #888; background: #000; }
     </style>
 </head>
 <body>
 
 <div class="header-container">
     <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo">
-    <input type="text" id="searchBox" placeholder="🔍 চ্যানেল সার্চ..." onkeyup="searchChannel()" style="padding: 8px; width: 200px; background: #1a242f; border:none; color:#fff; border-radius:5px;">
+    <input type="text" id="searchBox" placeholder="🔍 সার্চ..." onkeyup="searchChannel()" style="padding: 6px; width: 150px; background: #1a242f; border:none; color:#fff; border-radius:5px;">
 </div>
 
 <div class="player-wrapper">
@@ -48,75 +48,61 @@
     <video id="videoPlayer" controls autoplay playsinline muted></video>
 </div>
 
-<div class="marquee-container">
-    <marquee>কপিরাইট © আজিজুল হক কাওসার। অ্যারো কি ব্যবহার করে চ্যানেল পরিবর্তন করুন।</marquee>
+<div class="news-ticker">
+    <marquee>ব্রেকিং নিউজ: বাংলা প্রাইম টিভিতে স্বাগতম! | অ্যারো কি ব্যবহার করে চ্যানেল পরিবর্তন করুন | কপিরাইট © আজিজুল হক কাওসার।</marquee>
 </div>
 
-<div class="category-scroll" id="categoryBar"></div>
+<div id="categoryBar" style="display:flex; overflow-x:auto; padding:10px; gap:10px; background:#1a242f;"></div>
 
 <div class="trigger-area"></div>
 <div class="drawer" id="drawer">
-    <div style="padding: 20px; color: #00a8e1; font-weight: bold;">চ্যানেল তালিকা</div>
+    <div style="padding: 15px; color: #00a8e1; font-weight: bold;">চ্যানেল তালিকা</div>
     <div id="drawerContent"></div>
 </div>
 
 <div class="channel-list" id="channelGrid"></div>
+
+<footer>কপিরাইট © আজিজুল হক কাওসার</footer>
 
 <script>
     let allChannels = [], currentIndex = 0;
 
     fetch('channels.json').then(res => res.json()).then(data => {
         allChannels = data;
-        renderAll(data);
-        renderCategories(data);
+        renderUI(data);
+        renderCats(data);
     });
 
-    function renderCategories(data) {
+    function renderCats(data) {
         const bar = document.getElementById('categoryBar');
         const cats = ['All', ...new Set(data.map(c => c.category))];
-        bar.innerHTML = cats.map(c => `<div class="category-item" onclick="filterCat('${c}')">${c}</div>`).join('');
+        bar.innerHTML = cats.map(c => `<button onclick="filter('${c}')" style="background:#00a8e1; border:none; padding:5px 15px; border-radius:15px; cursor:pointer;">${c}</button>`).join('');
     }
 
-    function filterCat(cat) {
-        let filtered = cat === 'All' ? allChannels : allChannels.filter(c => c.category === cat);
-        renderAll(filtered);
+    function filter(cat) {
+        renderUI(cat === 'All' ? allChannels : allChannels.filter(c => c.category === cat));
     }
 
-    function renderAll(data) {
+    function renderUI(data) {
         const grid = document.getElementById('channelGrid');
         const drawer = document.getElementById('drawerContent');
-        grid.innerHTML = data.map((ch, i) => `
-            <div class="channel-card" onclick="playChannel('${ch.url}', ${i})">
-                <img src="${ch.logo}" style="width:50px; height:50px; border-radius:50%;">
-                <div style="font-size:11px; margin-top:5px;">${ch.name}</div>
-            </div>`).join('');
-        drawer.innerHTML = data.map((ch, i) => `
-            <div class="drawer-item" id="ch-${i}" onclick="playChannel('${ch.url}', ${i})">
-                <img src="${ch.logo}" style="width:30px; height:30px; margin-right:10px; border-radius:4px;">
-                ${ch.name}
-            </div>`).join('');
+        grid.innerHTML = data.map((ch, i) => `<div class="channel-card" onclick="play('${ch.url}', ${i})"><img src="${ch.logo}" width="40"><div style="font-size:10px">${ch.name}</div></div>`).join('');
+        drawer.innerHTML = data.map((ch, i) => `<div class="drawer-item" id="ch-${i}" onclick="play('${ch.url}', ${i})"><img src="${ch.logo}" width="30" style="margin-right:10px">${ch.name}</div>`).join('');
     }
 
-    function playChannel(url, index) {
-        currentIndex = index;
+    function play(url, i) {
+        currentIndex = i;
         const v = document.getElementById('videoPlayer');
         v.muted = false;
-        if (Hls.isSupported()) {
-            const hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); v.play();
-        }
+        const hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); v.play();
         document.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('active-channel'));
-        document.getElementById(`ch-${index}`).classList.add('active-channel');
+        document.getElementById(`ch-${i}`).classList.add('active-channel');
     }
 
     document.addEventListener('keydown', (e) => {
-        if(e.key === 'ArrowRight') playChannel(allChannels[(currentIndex + 1) % allChannels.length].url, (currentIndex + 1) % allChannels.length);
-        if(e.key === 'ArrowLeft') playChannel(allChannels[(currentIndex - 1 + allChannels.length) % allChannels.length].url, (currentIndex - 1 + allChannels.length) % allChannels.length);
+        if(e.key === 'ArrowRight') play(allChannels[(currentIndex + 1) % allChannels.length].url, (currentIndex + 1) % allChannels.length);
+        if(e.key === 'ArrowLeft') play(allChannels[(currentIndex - 1 + allChannels.length) % allChannels.length].url, (currentIndex - 1 + allChannels.length) % allChannels.length);
     });
-
-    function searchChannel() {
-        let input = document.getElementById('searchBox').value.toLowerCase();
-        renderAll(allChannels.filter(ch => ch.name.toLowerCase().includes(input)));
-    }
 </script>
 </body>
 </html>

@@ -3,95 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
     <title>Modern Media Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root { --bg: #050505; --text: #fff; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
         
-        /* হেডার: লোগো ও সার্চ */
-        .header { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #333; position: sticky; top: 0; z-index: 1000; background: var(--bg); }
-        .logo-box { font-size: 20px; font-weight: bold; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #333; }
         .search-box { padding: 8px 15px; border-radius: 20px; border: 1px solid #333; background: #151515; color: #fff; width: 200px; }
         
-        /* মেইন কন্টেইনার */
-        .wrapper { display: flex; height: calc(100vh - 70px); overflow: hidden; }
+        .wrapper { display: flex; height: calc(100vh - 60px); }
         
-        /* প্লেয়ার: স্থির */
-        .player-container { flex: 4; padding: 20px; position: relative; }
+        /* প্লেয়ার ও পোস্টার */
+        .player-container { flex: 4; padding: 20px; display: flex; flex-direction: column; }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; position: relative; }
         #videoPlayer { width: 100%; height: 100%; }
-        .watermark { position: absolute; top: 20px; right: 20px; color: red; font-weight: bold; animation: blink 2s infinite; z-index: 10; pointer-events: none; }
+        #poster-img { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; z-index: 5; }
+        .watermark { position: absolute; top: 15px; right: 25px; color: red; font-weight: bold; animation: blink 2s infinite; z-index: 10; }
         @keyframes blink { 0%, 100% { opacity: 0.2; } 50% { opacity: 1; } }
 
-        /* সাইডবার: স্ক্রলযোগ্য */
-        .channel-sidebar { flex: 1; min-width: 300px; overflow-y: auto; padding: 20px; border-left: 1px solid #333; }
-        .scrolling-container { border: 1px solid #555; border-radius: 20px; padding: 5px 15px; margin-bottom: 15px; overflow: hidden; background: #111; }
-        .channel-list { display: flex; flex-direction: column; gap: 10px; }
+        /* স্থির স্ক্রলিং টেক্সট কন্টেইনার */
+        .fixed-scroll { padding: 15px 20px; background: #111; border-bottom: 1px solid #333; }
+        
+        .channel-sidebar { flex: 1; min-width: 300px; display: flex; flex-direction: column; border-left: 1px solid #333; }
+        .channel-list { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        
         .channel-item { display: flex; align-items: center; gap: 15px; padding: 10px; background: #111; border-radius: 8px; cursor: pointer; border: 1px solid #333; }
-        .channel-logo { width: 45px; height: 45px; border-radius: 50%; background: #444; object-fit: cover; }
+        .channel-logo { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #444; }
 
-        /* পোর্ট্রেট মোড (মোবাইল) */
         @media (max-width: 768px) {
             body { overflow: auto; }
-            .wrapper { flex-direction: column; height: auto; overflow: visible; }
-            .player-container { flex: none; position: sticky; top: 0; z-index: 900; padding: 10px; }
-            .channel-sidebar { height: auto; overflow-y: visible; border-left: none; }
-            .channel-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .wrapper { flex-direction: column; height: auto; }
+            .player-container { position: sticky; top: 0; z-index: 999; background: var(--bg); padding: 10px; }
+            .channel-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; overflow: visible; }
             .channel-item { flex-direction: column; text-align: center; font-size: 11px; padding: 8px; }
-            .channel-logo { width: 70px; height: 70px; }
+            .channel-logo { width: 60px; height: 60px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="logo-box">📺 MEDIA</div>
-        <input type="text" class="search-box" placeholder="সার্চ করুন...">
-    </div>
+    <div class="header">📺 <b>MEDIA</b> <input type="text" class="search-box" placeholder="সার্চ..."></div>
 
     <div class="wrapper">
         <div class="player-container">
             <div class="video-box">
                 <div class="watermark">LIVE</div>
+                <img id="poster-img" src="" alt="Poster">
                 <video id="videoPlayer" controls autoplay></video>
             </div>
+            <div class="fixed-scroll"><marquee>স্বাগতম! চ্যানেল বাছাই করুন...</marquee></div>
         </div>
 
         <div class="channel-sidebar">
-            <div class="scrolling-container">
-                <marquee class="scrolling-text">চ্যানেল লিস্ট লোড হচ্ছে...</marquee>
-            </div>
             <div class="channel-list" id="channelList"></div>
         </div>
     </div>
 
     <script>
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-
         const video = document.getElementById('videoPlayer');
-        const list = document.getElementById('channelList');
+        const poster = document.getElementById('poster-img');
 
-        fetch('channels.json')
-            .then(r => r.json())
-            .then(data => {
-                data.forEach((ch, i) => {
-                    const div = document.createElement('div');
-                    div.className = 'channel-item';
-                    div.innerHTML = `<img src="${ch.logo}" class="channel-logo"><span>${ch.name}</span>`;
-                    div.onclick = () => play(ch.url);
-                    list.appendChild(div);
-                    if(i === 0) play(ch.url);
-                });
+        fetch('channels.json').then(r => r.json()).then(data => {
+            const list = document.getElementById('channelList');
+            data.forEach((ch, i) => {
+                const div = document.createElement('div');
+                div.className = 'channel-item';
+                div.innerHTML = `<img src="${ch.logo}" class="channel-logo"><span>${ch.name}</span>`;
+                div.onclick = () => { poster.src = ch.poster; poster.style.display = 'block'; play(ch.url); };
+                list.appendChild(div);
+                if(i === 0) { poster.src = ch.poster; play(ch.url); }
             });
+        });
 
         function play(url) {
-            if (Hls.isSupported()) { 
-                const hls = new Hls(); 
-                hls.loadSource(url); 
-                hls.attachMedia(video); 
-            } else { video.src = url; }
+            video.onplay = () => poster.style.display = 'none';
+            if (Hls.isSupported()) { const hls = new Hls(); hls.loadSource(url); hls.attachMedia(video); }
+            else video.src = url;
         }
     </script>
 </body>

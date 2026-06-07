@@ -6,25 +6,22 @@
     <title>Media Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        * { box-sizing: border-box; }
         body { margin: 0; background: #000; color: #fff; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
         .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid #333; }
         .wrapper { display: flex; flex: 1; overflow: hidden; }
         
-        /* বামপাশ (প্লেয়ার) */
-        .main-section { flex: 3; padding: 10px; display: flex; flex-direction: column; min-height: 250px; }
-        .video-box { width: 100%; height: 100%; background: #222; border-radius: 10px; position: relative; }
+        /* পোর্ট্রেট মোডের জন্য ফিক্সড হাইট */
+        .main-section { flex: 3; padding: 10px; display: flex; flex-direction: column; }
+        .video-box { width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 10px; position: relative; overflow: hidden; }
         #videoPlayer { width: 100%; height: 100%; }
 
-        /* ডানপাশ (চ্যানেল) */
         .sidebar { width: 300px; border-left: 1px solid #333; overflow-y: auto; padding: 10px; }
-        .channel-item { padding: 10px; border: 1px solid #333; margin-bottom: 8px; cursor: pointer; border-radius: 5px; display: flex; align-items: center; gap: 10px; }
+        .channel-item { padding: 12px; border: 1px solid #333; margin-bottom: 8px; cursor: pointer; border-radius: 5px; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        .channel-item:hover { background: #222; }
 
-        /* পোর্ট্রেট বা মোবাইল মোড */
         @media (max-width: 768px) {
             .wrapper { flex-direction: column; overflow-y: auto; }
-            .main-section { height: 300px; flex: none; } /* মোবাইলে প্লেয়ারের হাইট ফিক্সড */
+            .main-section { height: 300px; flex: none; }
             .sidebar { width: 100%; border-left: none; border-top: 1px solid #333; }
         }
     </style>
@@ -43,25 +40,25 @@
             </div>
         </div>
         <div class="sidebar" id="channelList">
-            <p>চ্যানেল লোড হচ্ছে...</p>
-        </div>
+            </div>
     </div>
 
     <script>
         const video = document.getElementById('videoPlayer');
         const list = document.getElementById('channelList');
 
-        // নমুনা চ্যানেল ডাটা
+        // আপনার চ্যানেলের ডাটা এখানে সরাসরি লিখুন
         const channels = [
-            { "name": "Channel 1", "logo": "https://via.placeholder.com/50", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
+            { "name": "Bangla Prime 1", "logo": "https://via.placeholder.com/50", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+            { "name": "Bangla Prime 2", "logo": "https://via.placeholder.com/50", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
         ];
 
-        function renderChannels(data) {
+        function renderChannels() {
             list.innerHTML = '';
-            data.forEach(ch => {
+            channels.forEach(ch => {
                 const div = document.createElement('div');
                 div.className = 'channel-item';
-                div.innerHTML = `<img src="${ch.logo}" width="40"> ${ch.name}`;
+                div.innerHTML = `<img src="${ch.logo}" width="40" style="border-radius:50%"> ${ch.name}`;
                 div.onclick = () => playVideo(ch.url);
                 list.appendChild(div);
             });
@@ -76,7 +73,7 @@
             } else { video.src = url; }
         }
 
-        renderChannels(channels);
+        renderChannels();
     </script>
 </body>
 </html>

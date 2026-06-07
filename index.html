@@ -2,30 +2,17 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Portal</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        /* লেআউট ফিক্স */
         body { margin: 0; background: #000; color: #fff; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #333; flex-shrink: 0; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #333; }
         .wrapper { display: flex; flex: 1; overflow: hidden; }
-        
-        /* বামপাশ */
         .main-section { flex: 3; padding: 15px; display: flex; flex-direction: column; }
         .video-box { width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 10px; position: relative; }
         #videoPlayer { width: 100%; height: 100%; }
-        #poster { position: absolute; top:0; left:0; width: 100%; height: 100%; object-fit: cover; z-index: 10; display: block; }
-        
-        /* ডানপাশ */
         .sidebar { width: 300px; border-left: 1px solid #333; overflow-y: auto; padding: 10px; }
         .channel-item { padding: 10px; border: 1px solid #333; margin-bottom: 5px; cursor: pointer; border-radius: 5px; display: flex; align-items: center; gap: 10px; }
-
-        /* মোবাইল রেসপন্সিভ */
-        @media (max-width: 768px) {
-            .wrapper { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; border-left: none; border-top: 1px solid #333; }
-        }
     </style>
 </head>
 <body>
@@ -35,6 +22,49 @@
         <input type="text" placeholder="সার্চ...">
     </div>
 
+    <div class="wrapper">
+        <div class="main-section">
+            <div class="video-box">
+                <video id="videoPlayer" controls autoplay></video>
+            </div>
+        </div>
+        <div class="sidebar" id="channelList">
+            <p>চ্যানেল লোড হচ্ছে...</p>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const list = document.getElementById('channelList');
+
+        // fetch ব্যবহার না করে সরাসরি ডাটা দিয়ে চেক করছি
+        const channels = [
+            { "name": "Channel 1", "logo": "https://via.placeholder.com/50", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
+        ];
+
+        function renderChannels(data) {
+            list.innerHTML = '';
+            data.forEach(ch => {
+                const div = document.createElement('div');
+                div.className = 'channel-item';
+                div.innerHTML = `<img src="${ch.logo}" width="40"> ${ch.name}`;
+                div.onclick = () => playVideo(ch.url);
+                list.appendChild(div);
+            });
+        }
+
+        function playVideo(url) {
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+            } else { video.src = url; }
+        }
+
+        renderChannels(channels);
+    </script>
+</body>
+</html>
     <div class="wrapper">
         <div class="main-section">
             <div class="video-box">

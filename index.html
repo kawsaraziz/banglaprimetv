@@ -3,80 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bangla Prime TV</title>
+    <title>Bioscope Style TV</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body { margin: 0; background: #050505; color: #ccc; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { margin: 0; background-color: #000033; color: #ffffff; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* হেডার */
-        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; z-index: 1000; }
-        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #333; }
-        #search { padding: 6px 12px; background: #111; border: 1px solid #333; border-radius: 20px; color: #fff; width: 120px; }
+        /* স্প্ল্যাশ স্ক্রিন */
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000033; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        #splash img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* প্লেয়ার ও ওয়াটারমার্ক */
-        .player-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
-        #videoPlayer { width: 100%; height: 100%; }
-        .watermark { position: absolute; top: 10%; left: 10%; font-size: 2vw; color: #fff; opacity: 0.4; pointer-events: none; z-index: 500; animation: moveAnim 20s linear infinite; }
-        @keyframes moveAnim { 0%, 100% { top: 10%; left: 10%; } 50% { top: 80%; left: 80%; } }
+        /* মেইন লেআউট */
+        .main-container { display: flex; flex-direction: row; flex-grow: 1; overflow: hidden; height: 100%; }
+        @media (max-width: 768px) { .main-container { flex-direction: column; } }
 
-        /* সাইড মেনু */
-        .trigger { position: fixed; left: 0; top: 0; width: 40px; height: 100%; z-index: 2000; }
-        .drawer { height: 100%; width: 0; position: fixed; z-index: 2001; top: 0; left: 0; background: #0a0a0a; transition: 0.3s; overflow-y: auto; border-right: 1px solid #222; }
-        .trigger:hover + .drawer, .drawer:hover { width: 250px; }
-        .drawer-item { display: flex; align-items: center; padding: 10px; cursor: pointer; border-bottom: 1px solid #111; }
+        /* প্লেয়ার সেকশন */
+        .left-panel { flex: 3; display: flex; flex-direction: column; min-height: 0; }
+        .player-wrapper { position: relative; width: 100%; background-color: #000; flex-shrink: 0; display: flex; }
+        #videoPlayer { width: 100%; height: 100%; object-fit: contain; }
+        #videoPoster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; object-fit: cover; }
+        .watermark { position: absolute; font-size: 2vw; color: #CC0066; opacity: 0.6; z-index: 500; animation: moveAnim 15s linear infinite; pointer-events: none; }
+        @keyframes moveAnim { 0% { top: 10%; left: 10%; } 50% { top: 80%; left: 80%; } 100% { top: 10%; left: 10%; } }
 
-        /* নিউজ টিকার */
-        .ticker-wrapper { padding: 3px; background: linear-gradient(90deg, #ff0000, #00a8e1, #ff0000); background-size: 400%; animation: gradientMove 5s infinite; }
-        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .ticker-bg { background: #000; padding: 5px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; padding: 15px; overflow-y: auto; flex-grow: 1; }
-        .card { background: #111; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; border: 1px solid #222; }
+        /* রাইট প্যানেল */
+        .right-panel { flex: 1; overflow-y: auto; background: #000022; padding: 10px; }
+        .cat-bar { display: flex; gap: 5px; padding-bottom: 10px; overflow-x: auto; }
+        .cat-btn { background: #CC0066; color: white; border: none; padding: 4px 10px; border-radius: 10px; cursor: pointer; font-size: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; }
+        .card { background-color: #00004d; padding: 8px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 10px; }
+        .ticker-wrapper { color: #ffffff; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #CC0066; background: #000033; flex-shrink: 0; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo-img">
-    <input type="text" id="search" placeholder="সার্চ..." onkeyup="search()">
+<div id="splash"><img src="YOUR_PORTRAIT_IMAGE_URL" alt="Loading..."></div>
+
+<div class="main-container">
+    <div class="left-panel">
+        <div class="player-wrapper">
+            <div class="watermark">Bangla Prime TV</div>
+            <img id="videoPoster" src="YOUR_PLAYER_POSTER_URL" alt="Poster">
+            <video id="videoPlayer" controls autoplay playsinline muted></video>
+        </div>
+        <div class="ticker-wrapper">
+            <marquee>ব্রেকিং নিউজ: বাংলা প্রাইম টিভিতে স্বাগতম! | কপিরাইট © আজিজুল হক কাওসার</marquee>
+        </div>
+    </div>
+    
+    <div class="right-panel">
+        <div class="cat-bar" id="catBar"></div>
+        <div class="grid" id="grid"></div>
+    </div>
 </div>
-
-<div class="player-wrapper">
-    <div class="watermark">Bangla Prime TV</div>
-    <video id="videoPlayer" controls autoplay playsinline muted></video>
-</div>
-
-<div class="ticker-wrapper"><div class="ticker-bg"><marquee>ব্রেকিং নিউজ: বাংলা প্রাইম টিভিতে স্বাগতম! | অ্যারো কি দিয়ে চ্যানেল বদলান | কপিরাইট © আজিজুল হক কাওসার</marquee></div></div>
-
-<div class="trigger"></div>
-<div class="drawer" id="drawer">
-    <div style="padding:15px; font-weight:bold;">চ্যানেল তালিকা</div>
-    <div id="drawerList"></div>
-</div>
-
-<div class="grid" id="grid"></div>
 
 <script>
+    setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 4000);
+    
     let channels = [];
     fetch('channels.json').then(r => r.json()).then(d => {
         channels = d;
         render(d);
+        let cats = ['All', ...new Set(d.map(c => c.category))];
+        document.getElementById('catBar').innerHTML = cats.map(c => `<button class="cat-btn" onclick="filter('${c}')">${c}</button>`).join('');
     });
 
     function render(d) {
-        document.getElementById('grid').innerHTML = d.map(c => `<div class="card" onclick="play('${c.url}')"><img src="${c.logo}" width="40"><div style="font-size:11px">${c.name}</div></div>`).join('');
-        document.getElementById('drawerList').innerHTML = d.map(c => `<div class="drawer-item" onclick="play('${c.url}')"><img src="${c.logo}" width="25" style="margin-right:10px">${c.name}</div>`).join('');
+        document.getElementById('grid').innerHTML = d.map(c => `<div class="card" onclick="play('${c.url}')"><img src="${c.logo}" width="30"><br>${c.name}</div>`).join('');
     }
 
+    function filter(cat) { render(cat === 'All' ? channels : channels.filter(c => c.category === cat)); }
+
     function play(url) {
+        document.getElementById('videoPoster').style.display = 'none';
         const v = document.getElementById('videoPlayer');
         v.muted = false;
         const hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); v.play();
-    }
-    
-    function search() {
-        let val = document.getElementById('search').value.toLowerCase();
-        render(channels.filter(c => c.name.toLowerCase().includes(val)));
     }
 </script>
 </body>

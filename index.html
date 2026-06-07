@@ -8,39 +8,46 @@
     <style>
         body { margin: 0; background-color: #000033; color: #ffffff; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
+        /* স্প্ল্যাশ স্ক্রিন */
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000033; z-index: 9999; display: flex; justify-content: center; align-items: center; }
         #splash img { width: 100%; height: 100%; object-fit: cover; }
 
-        .main-container { display: flex; flex-direction: row; flex-grow: 1; overflow: hidden; }
-        @media (max-width: 768px) { .main-container { flex-direction: column; overflow-y: auto; } }
+        /* হেডার */
+        .top-header { background: #000033; padding: 10px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #CC0066; }
+        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #CC0066; }
+        #search { flex-grow: 1; padding: 8px 15px; border-radius: 20px; border: none; outline: none; }
 
-        .left-panel { flex: 3; display: flex; flex-direction: column; min-height: 0; }
-        .player-wrapper { position: relative; width: 100%; background-color: #000; aspect-ratio: 16/9; }
-        #videoPlayer { width: 100%; height: 100%; }
+        /* মেইন বডি */
+        .main-body { display: flex; flex-direction: row; flex-grow: 1; overflow: hidden; }
+        @media (max-width: 768px) { .main-body { flex-direction: column; overflow-y: auto; } }
+
+        /* বাম প্যানেল */
+        .left-panel { flex: 3; display: flex; flex-direction: column; }
+        .player-wrapper { position: relative; width: 100%; background-color: #000; aspect-ratio: 16/9; flex-shrink: 0; }
+        #videoPlayer { width: 100%; height: 100%; display: block; }
         #videoPoster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; object-fit: cover; }
         
-        /* রাইট প্যানেল - লোগো, সার্চ ও চ্যানেল লিস্ট */
+        /* নিউজ টিকার এখন প্লেয়ারের সাথে লেগে থাকবে */
+        .ticker-wrapper { width: 100%; color: #ffffff; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #CC0066; background: #000033; margin-top: -4px; }
+        
+        /* ডান প্যানেল */
         .right-panel { flex: 1; display: flex; flex-direction: column; background: #000022; overflow: hidden; }
-        
-        /* হেডার: লোগো ও সার্চ বক্স */
-        .panel-header { padding: 15px; background: #000033; display: flex; align-items: center; gap: 10px; }
-        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #CC0066; }
-        #search { flex-grow: 1; padding: 6px; border-radius: 15px; border: none; }
-        
-        .cat-bar { padding: 10px 15px; overflow-x: auto; display: flex; gap: 8px; background: #000033; flex-shrink: 0; }
+        .cat-bar { display: flex; gap: 8px; padding: 10px; overflow-x: auto; background: #000033; }
         .cat-btn { background: #CC0066; color: white; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        
-        .grid { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 15px; }
-        .card { background-color: #00004d; padding: 8px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 11px; }
-
-        .ticker-wrapper { width: 100%; color: #ffffff; font-size: 14px; padding: 10px 0; border-bottom: 1px solid #CC0066; background: #000033; flex-shrink: 0; }
+        .grid { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 10px; }
+        .card { background-color: #00004d; padding: 8px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 10px; }
     </style>
 </head>
 <body>
 
 <div id="splash"><img src="YOUR_PORTRAIT_IMAGE_URL" alt="Loading..."></div>
 
-<div class="main-container">
+<div class="top-header">
+    <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo-img">
+    <input type="text" id="search" placeholder="চ্যানেল সার্চ করুন..." onkeyup="search()">
+</div>
+
+<div class="main-body">
     <div class="left-panel">
         <div class="player-wrapper">
             <img id="videoPoster" src="YOUR_PLAYER_POSTER_URL" alt="Poster">
@@ -52,10 +59,6 @@
     </div>
     
     <div class="right-panel">
-        <div class="panel-header">
-            <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo-img">
-            <input type="text" id="search" placeholder="সার্চ..." onkeyup="search()">
-        </div>
         <div class="cat-bar" id="catBar"></div>
         <div class="grid" id="grid"></div>
     </div>

@@ -3,95 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bioscope Style TV</title>
+    <title>Bangla Prime TV</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body { margin: 0; background-color: #000033; color: #ffffff; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { margin: 0; background-color: #000; color: #fff; font-family: sans-serif; overflow: hidden; }
+        .app-container { display: flex; flex-direction: column; height: 100vh; }
+        @media (min-width: 900px) { .app-container { flex-direction: row; } }
         
-        /* স্প্ল্যাশ স্ক্রিন */
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000033; z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        #splash img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* হেডার */
-        .top-header { background: #000033; padding: 10px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #CC0066; }
-        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #CC0066; }
-        #search { flex-grow: 1; padding: 8px 15px; border-radius: 20px; border: none; outline: none; }
-
-        /* মেইন বডি */
-        .main-body { display: flex; flex-direction: row; flex-grow: 1; overflow: hidden; }
-        @media (max-width: 768px) { .main-body { flex-direction: column; overflow-y: auto; } }
-
-        /* বাম প্যানেল */
-        .left-panel { flex: 3; display: flex; flex-direction: column; }
-        .player-wrapper { position: relative; width: 100%; background-color: #000; aspect-ratio: 16/9; flex-shrink: 0; }
-        #videoPlayer { width: 100%; height: 100%; display: block; }
-        #videoPoster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; object-fit: cover; }
+        .player-section { flex: 1; display: flex; flex-direction: column; background: #000; position: relative; }
         
-        /* নিউজ টিকার এখন প্লেয়ারের সাথে লেগে থাকবে */
-        .ticker-wrapper { width: 100%; color: #ffffff; font-size: 14px; padding: 8px 0; border-bottom: 1px solid #CC0066; background: #000033; margin-top: -4px; }
+        /* এনিমেটেড ওয়াটারমার্ক */
+        .watermark { position: absolute; top: 10px; left: 10px; color: rgba(255,255,255,0.3); font-size: 16px; z-index: 10; pointer-events: none; animation: float 15s infinite alternate ease-in-out; }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(50vw, 40vh); } }
         
-        /* ডান প্যানেল */
-        .right-panel { flex: 1; display: flex; flex-direction: column; background: #000022; overflow: hidden; }
-        .cat-bar { display: flex; gap: 8px; padding: 10px; overflow-x: auto; background: #000033; }
-        .cat-btn { background: #CC0066; color: white; border: none; padding: 5px 12px; border-radius: 15px; cursor: pointer; font-size: 11px; white-space: nowrap; }
-        .grid { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; padding: 10px; }
-        .card { background-color: #00004d; padding: 8px; text-align: center; border-radius: 6px; cursor: pointer; font-size: 10px; }
+        .header { background: #0f171e; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #00a8e1; }
+        .logo-area { color: #00a8e1; font-weight: bold; font-size: 20px; }
+        #searchInput { padding: 8px; border-radius: 4px; border: none; width: 150px; }
+        
+        .player-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; }
+        #videoPlayer { width: 100%; height: 100%; }
+
+        /* স্ক্রলিং টেক্সট */
+        .marquee-box { background: #000; color: #00a8e1; padding: 10px; overflow: hidden; white-space: nowrap; border-top: 1px solid #00a8e1; }
+        .marquee-text { display: inline-block; animation: scroll-left 25s linear infinite; }
+        @keyframes scroll-left { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        .channel-section { width: 100%; height: 30vh; overflow-y: auto; background: #0f171e; }
+        @media (min-width: 900px) { .channel-section { width: 350px; height: 100vh; } }
+        .channel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
+        .channel-item { background: #1a242f; padding: 5px; text-align: center; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .channel-item:hover { background: #2c3e50; }
+        .channel-logo { width: 60px; height: 60px; border-radius: 4px; object-fit: cover; }
+        .channel-name { font-size: 9px; margin-top: 4px; }
     </style>
 </head>
 <body>
 
-<div id="splash"><img src="YOUR_PORTRAIT_IMAGE_URL" alt="Loading..."></div>
-
-<div class="top-header">
-    <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo-img">
-    <input type="text" id="search" placeholder="চ্যানেল সার্চ করুন..." onkeyup="search()">
-</div>
-
-<div class="main-body">
-    <div class="left-panel">
-        <div class="player-wrapper">
-            <img id="videoPoster" src="YOUR_PLAYER_POSTER_URL" alt="Poster">
-            <video id="videoPlayer" controls autoplay playsinline muted></video>
+<div class="app-container">
+    <div class="player-section">
+        <div class="watermark">Bangla Prime Tv By Kawsar Aziz</div>
+        <div class="header">
+            <div class="logo-area">Bangla Prime</div>
+            <input type="text" id="searchInput" placeholder="চ্যানেল খুঁজুন..." onkeyup="filterChannels()">
         </div>
-        <div class="ticker-wrapper">
-            <marquee>ব্রেকিং নিউজ: বাংলা প্রাইম টিভিতে স্বাগতম! | কপিরাইট © আজিজুল হক কাওসার</marquee>
+        <div class="player-wrapper">
+            <video id="videoPlayer" controls playsinline></video>
+        </div>
+        <div class="marquee-box">
+            <div class="marquee-text">বাংলা প্রাইম টিভি হলো আজিজুল হক কাওসার কর্তৃক নির্মিত একটি অনলাইন লাইভ টিভি প্ল্যাটফর্ম। এখানে বাংলাদেশসহ বিশ্বের জনপ্রিয় টিভি চ্যানেল, সংবাদ ও খেলাধুলা উপভোগ করা যায়।</div>
         </div>
     </div>
-    
-    <div class="right-panel">
-        <div class="cat-bar" id="catBar"></div>
-        <div class="grid" id="grid"></div>
+    <div class="channel-section">
+        <div class="channel-grid" id="channelList"></div>
     </div>
 </div>
 
 <script>
-    setTimeout(() => { document.getElementById('splash').style.display = 'none'; }, 4000);
-    
-    let channels = [];
-    fetch('channels.json').then(r => r.json()).then(d => {
-        channels = d;
-        render(d);
-        let cats = ['All', ...new Set(d.map(c => c.category))];
-        document.getElementById('catBar').innerHTML = cats.map(c => `<button class="cat-btn" onclick="filter('${c}')">${c}</button>`).join('');
-    });
+    let hls = new Hls();
+    const channelData = [
+        {"name": "Channel i", "logo": "https://s3.aynaott.com/storage/8e998f20a9cc52cb8eb1f52a5bf38204", "url": "https://tvsen6.aynaott.com/channeli/index.m3u8"},
+        {"name": "Ntv", "logo": "https://s3.aynaott.com/storage/1a619c9b917eb35898020cd323e415a7", "url": "https://tvsen5.aynaott.com/ntvbd/index.m3u8"},
+        {"name": "Btv", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5swNbJp-udr2v98Scg2wSPNbzAO8LGEH3rA&s", "url": "https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/1709-audio_113392_eng=113200-video=2202800.m3u8"},
+        {"name": "Tsports", "logo": "https://s3.aynaott.com/storage/dbc585f70a60b9855b6e13a8ce4cb6f4", "url": "https://tvsen7.aynaott.com/tsports-hd/index.m3u8"},
+        {"name": "Somoy News", "logo": "https://s3.aynaott.com/storage/ece71c1163a377fbe2d93f9d28c34f60", "url": "https://tvsen6.aynaott.com/somoytv/index.m3u8"},
+        {"name": "Jamuna TV", "logo": "https://s3.aynaott.com/storage/aac6488b68844e5756ab46eb79659de8", "url": "https://tvsen6.aynaott.com/jamunatv/index.m3u8"},
+        {"name": "Channel 24", "logo": "https://s3.aynaott.com/storage/129b0d0a02566999a0c164cd7d506e55", "url": "https://tvsen6.aynaott.com/channel24/index.m3u8"},
+        {"name": "Ekattor TV", "logo": "https://s3.aynaott.com/storage/d91767995b2f2a54852c92bbbc20daa7", "url": "https://tvsen6.aynaott.com/ekattorbdtv/index.m3u8"},
+        {"name": "Zee Bangla", "logo": "https://tvassets.roarzone.net/images/34.png", "url": "https://yupptvcatchupire.yuppcdn.net/preview/zeebangla/2500.m3u8"},
+        {"name": "Bangla Vision", "logo": "https://s3.aynaott.com/storage/788ab3e49b2aa6af247722762ed6e72a", "url": "https://tvsen5.aynaott.com/banglavision/index.m3u8"},
+        {"name": "Rtv", "logo": "https://s3.aynaott.com/storage/094587a26f2c5e4f2962104728ec8c5d", "url": "https://tvsen5.aynaott.com/RtvHD/index.m3u8"},
+        {"name": "ATN Bangla", "logo": "https://s3.aynaott.com/storage/eff41809fca04f7c1da5481e135d7913", "url": "https://tvsen5.aynaott.com/atnbangla/index.m3u8"},
+        {"name": "Etv", "logo": "https://s3.aynaott.com/storage/8a1af81802b0728c064c2adabcdc72c8", "url": "https://tvsen6.aynaott.com/etv/index.m3u8"},
+        {"name": "Maasranga Tv", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmvSsoq-TCsc5BU0zoDCbrXy4N38XdySykpg&s", "url": "https://tvsen5.aynaott.com/maasrangatv/index.m3u8"},
+        {"name": "Deepto Tv", "logo": "https://s3.aynaott.com/storage/76717b7a598a30815a1bdb16ecd3af6c", "url": "https://tvsen5.aynaott.com/DeeptoTVHD/index.m3u8"},
+        {"name": "Gtv", "logo": "https://s3.aynaott.com/storage/417a833f6d83021c99bfc3d4176610f4", "url": "https://tvsen5.aynaott.com/Ravc7gPCZpxk/index.m3u8"},
+        {"name": "Desh Tv", "logo": "https://s3.aynaott.com/storage/d10390e5434e8cb44172257abd714beb", "url": "https://tvsen6.aynaott.com/deshtv/index.m3u8"},
+        {"name": "Boishakhi Tv", "logo": "https://s3.aynaott.com/storage/58658d4594ca1ff3c5031c9d8e3d9fc0", "url": "https://tvsen6.aynaott.com/boishakhitv/index.m3u8"},
+        {"name": "Channel Nine", "logo": "https://s3.aynaott.com/storage/a959f06b4fc9e1421f867b6c1601fe43", "url": "https://tvsen6.aynaott.com/channel9/index.m3u8"},
+        {"name": "Asian Tv", "logo": "https://s3.aynaott.com/storage/5282cec3a2e9349b750540d658cf1b6c", "url": "https://tvsen6.aynaott.com/asiantv/index.m3u8"},
+        {"name": "SATV", "logo": "https://s3.aynaott.com/storage/f710d2ff532cb7e7b75566232c5b72d3", "url": "https://tvsen6.aynaott.com/satv/index.m3u8"},
+        {"name": "Bangla Tv", "logo": "https://s3.aynaott.com/storage/e42ecfa90e3d6b15bdb7fea5ef673864", "url": "https://tvsen6.aynaott.com/banglatv/index.m3u8"},
+        {"name": "My Tv", "logo": "https://s3.aynaott.com/storage/c5b2c623863fbe4033d59d52ff7371ac", "url": "https://tvsen6.aynaott.com/mytv/index.m3u8"},
+        {"name": "Global Television", "logo": "https://s3.aynaott.com/storage/ffd7ba9b76ad555933f94bcb7ff26b44", "url": "https://tvsen6.aynaott.com/globaltvhd/index.m3u8"},
+        {"name": "Bijoy Television", "logo": "https://s3.aynaott.com/storage/f23d6f82c1a16458fe0e4c6f11b8fd87", "url": "https://tvsen6.aynaott.com/bijoytv/index.m3u8"},
+        {"name": "Nexus Tv", "logo": "https://s3.aynaott.com/storage/90635c3edf6e3c8dd92210b7248f1fa0", "url": "https://tvsen6.aynaott.com/nexustv/index.m3u8"},
+        {"name": "Mohona TV", "logo": "https://s3.aynaott.com/storage/73082846fdc15d9f0e7268b104c55d92", "url": "https://tvsen6.aynaott.com/mohonatv/index.m3u8"},
+        {"name": "Thikana Tv", "logo": "https://s3.aynaott.com/storage/6d1aaa03b84a69992940873fc11af8fc", "url": "https://5dd3981940faa.streamlock.net:443/thikanatv/thikanatv/playlist.m3u8"},
+        {"name": "Zee Bangla Cinema", "logo": "https://tvassets.roarzone.net/images/29.png", "url": "https://edge2.roarzone.net:8447/roarzone/edge3/zee_bangla_cinema/index.m3u8"},
+        {"name": "Sony AATH", "logo": "https://tvassets.roarzone.net/images/33.png", "url": "https://edge2.roarzone.net:8447/roarzone/edge3/sonyaath/index.m3u8"},
+        {"name": "Desh Bidesh", "logo": "https://pbs.twimg.com/profile_images/739539785304281088/zMwNO936_400x400.jpg", "url": "https://dbcanada.sonarbanglatv.com/deshebideshe/dbtv/index.m3u8"},
+        {"name": "Ptv Sports", "logo": "https://s3.aynaott.com/storage/9d9d7cbfba5a8ceea648bbd963ad1014", "url": "https://tvsen5.aynaott.com/PtvSports/index.m3u8"},
+        {"name": "A Sports", "logo": "https://s3.aynaott.com/storage/64de30d2df9b2a888cb73f17614a9a8b", "url": "https://tvsen6.aynaott.com/asports/index.m3u8"},
+        {"name": "Fox Sports 2", "logo": "https://s3.aynaott.com/storage/da4282cd107cc3d40efadae488b187e5", "url": "https://tvsen7.aynaott.com/foxsports2/index.m3u8"},
+        {"name": "Espn", "logo": "https://s3.aynaott.com/storage/b46df1959322aa48d270a6b163234c76", "url": "https://tvsen5.aynaott.com/espn/index.m3u8"},
+        {"name": "Willow HD TV", "logo": "https://s3.aynaott.com/storage/94a778ec3219f7eb54bdf1ee07a95788", "url": "https://tvsen5.aynaott.com/willowhd/index.m3u8"},
+        {"name": "Oman Sports", "logo": "https://s3.aynaott.com/storage/33f87783637fc95fdb8837ba9344c9e9", "url": "https://partneta.cdn.mgmlcdn.com/omsport/smil:omsport.stream.smil/chunklist.m3u8"},
+        {"name": "Star Sports 1", "logo": "https://apiexcellent.com/storage/images/medias/television/product/star-sports-1-television10433.webp", "url": "https://tvsen7.aynaott.com/sspts1/index.m3u8"},
+        {"name": "Fifa+", "logo": "https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg", "url": "https://37b4c228.wurl.com/manifest/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWZyX0ZJRkFQbHVzRnJlbmNoX0hMUw/6f5437c5-e015-4754-8476-c8c6d27d3a55/1.m3u8"},
+        {"name": "ATN News", "logo": "https://s3.aynaott.com/storage/8a3c5215dc0b943dc0a80333c0ab21ce", "url": "https://tvsen6.aynaott.com/atnnews/index.m3u8"},
+        {"name": "Star Jalsha", "logo": "https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(9).jpeg", "url": "https://yupptvcatchupire.yuppcdn.net/preview/starjalsha/1800.m3u8"},
+        {"name": "Colours Bangla", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCY6kBmJxGzGzPGH6seJwlDBVcw9DngSoilA&s", "url": "https://yupptvcatchupire.yuppcdn.net/preview/colorsbanglahd/800.m3u8"},
+        {"name": "SRK TV", "logo": "https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/IMG_20260528_193117_215.jpg", "url": "https://srknowapp.ncare.live/srktvhlswodrm/srktv.stream/playlist.m3u8"},
+        {"name": "Sangeet Bangla", "logo": "https://s3.aynaott.com/storage/80424ce0682e14e7d51e28de33d5f380", "url": "https://cdn-4.pishow.tv/live/1143/master.m3u8"},
+        {"name": "G Series", "logo": "https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(7).jpeg", "url": "https://vods2.aynaott.com/gseriesDrama/tracks-v1a1/mono.ts.m3u8"},
+        {"name": "Btv Ctg", "logo": "https://s3.aynaott.com/storage/00da8a07fb26b2fb79359ee535e4c7bc", "url": "https://tvsen6.aynaott.com/btvctg/index.m3u8"},
+        {"name": "Btv Sangsad", "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/BTV_Sangsad.png/200px-BTV_Sangsad.png", "url": "https://tvsen6.aynaott.com/btvsangsad/index.m3u8"},
+        {"name": "Independent", "logo": "https://s3.aynaott.com/storage/e61d856d566373b52662c66d2a715f53", "url": "https://tvsen6.aynaott.com/independent/index.m3u8"},
+        {"name": "DBC News", "logo": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTGiN0waa-iiUEnMX_zZ-FGF2EhrplJZ5___A&s", "url": "https://tvsen6.aynaott.com/dbcnews/index.m3u8"}
+    ];
 
-    function render(d) {
-        document.getElementById('grid').innerHTML = d.map(c => `<div class="card" onclick="play('${c.url}')"><img src="${c.logo}" width="30"><br>${c.name}</div>`).join('');
+    function renderChannels(data = channelData) {
+        const list = document.getElementById('channelList');
+        list.innerHTML = '';
+        data.forEach(ch => {
+            const div = document.createElement('div');
+            div.className = 'channel-item';
+            div.innerHTML = `<img src="${ch.logo}" class="channel-logo"><div class="channel-name">${ch.name}</div>`;
+            div.onclick = () => playChannel(ch.url);
+            list.appendChild(div);
+        });
     }
 
-    function filter(cat) { render(cat === 'All' ? channels : channels.filter(c => c.category === cat)); }
+    function playChannel(url) {
+        const video = document.getElementById('videoPlayer');
+        if (Hls.isSupported()) {
+            hls.destroy();
+            hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            video.play();
+        } else { video.src = url; video.play(); }
+    }
 
-    function play(url) {
-        document.getElementById('videoPoster').style.display = 'none';
-        const v = document.getElementById('videoPlayer');
-        v.muted = false;
-        const hls = new Hls(); hls.loadSource(url); hls.attachMedia(v); v.play();
+    function filterChannels() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        renderChannels(channelData.filter(c => c.name.toLowerCase().includes(query)));
     }
-    
-    function search() {
-        let val = document.getElementById('search').value.toLowerCase();
-        render(channels.filter(c => c.name.toLowerCase().includes(val)));
-    }
+
+    renderChannels();
 </script>
 </body>
-</html>
+</html>/html>  const query = document.getElementById('searchInput').value.toLowerCase();
+        renderChannels(channelData.filter(c => c.name.toLowerCase().includes(query)));
+    }
+
+    renderChannels();
+</script>
+</body>
+</html>ls() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        renderChannels(channelData.filter(c => c.name.toLowerCase().includes(query)));
+    }
+
+    function playChannel(url) {
+        const video = document.getElementById('videoPlayer');
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            video.play();
+        } else { video.src = url; video.play(); }
+    }
+
+    renderChannels();
+</script>
+</body>
+</html>>

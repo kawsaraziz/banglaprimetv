@@ -2,79 +2,88 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Media Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangla Prime TV</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .header { height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid #333; }
-        .wrapper { display: flex; flex: 1; overflow: hidden; }
+        body { margin: 0; background: #050505; color: #ccc; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        .main-section { flex: 3; padding: 10px; display: flex; flex-direction: column; }
-        .video-box { width: 100%; aspect-ratio: 16/9; background: #222; border-radius: 10px; position: relative; }
-        #videoPlayer { width: 100%; height: 100%; }
+        /* হেডার ও আধুনিক সার্চ বার */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; }
+        .logo-img { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #333; }
+        #search { padding: 6px 12px; background: #111; border: 1px solid #333; border-radius: 20px; color: #fff; font-size: 12px; width: 120px; outline: none; transition: 0.3s; }
+        #search:focus { border-color: #00a8e1; width: 150px; }
 
-        /* চ্যানেল লিস্ট গ্রিড সিস্টেম */
-        .sidebar { flex: 1; padding: 10px; overflow-y: auto; }
-        .channel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .channel-item { aspect-ratio: 1/1; background: #111; border: 1px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; text-align: center; padding: 5px; }
-        .channel-logo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-bottom: 5px; }
+        /* ভিডিও প্লেয়ার */
+        .player-container { width: 100%; aspect-ratio: 16/9; background: #000; position: relative; }
+        video { width: 100%; height: 100%; }
 
-        @media (max-width: 768px) {
-            .wrapper { flex-direction: column; overflow-y: auto; }
-            .main-section { height: 250px; flex: none; }
-        }
+        /* নিউজ টিকার - পুরোপুরি দৃশ্যমান */
+        .ticker-container { background: #000; padding: 8px 0; border-bottom: 1px solid #222; }
+        .ticker { font-size: 15px; font-weight: bold; color: #fff; background: #0a0a0a; padding: 5px 15px; border-radius: 4px; display: inline-block; white-space: nowrap; }
+
+        /* গ্রিড */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; padding: 20px; overflow-y: auto; flex-grow: 1; }
+        .card { background: #111; padding: 12px; text-align: center; border-radius: 10px; border: 1px solid #222; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: #00a8e1; transform: translateY(-3px); }
+
+        footer { text-align: center; padding: 10px; font-size: 11px; color: #555; background: #050505; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div>📺 বাংলা প্রাইম</div>
-        <input type="text" placeholder="সার্চ...">
-    </div>
+<div class="header">
+    <img src="https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg" class="logo-img">
+    <input type="text" id="search" placeholder="সার্চ করুন..." onkeyup="search()">
+</div>
 
-    <div class="wrapper">
-        <div class="main-section">
-            <div class="video-box">
-                <video id="videoPlayer" controls autoplay></video>
-            </div>
-        </div>
-        <div class="sidebar">
-            <div class="channel-grid" id="channelList"></div>
-        </div>
-    </div>
+<div class="player-container">
+    <video id="videoPlayer" controls autoplay playsinline muted></video>
+</div>
 
-    <script>
-        const video = document.getElementById('videoPlayer');
-        const list = document.getElementById('channelList');
+<div class="ticker-container">
+    <marquee class="ticker" scrollamount="6">
+        ব্রেকিং নিউজ: বাংলা প্রাইম টিভিতে স্বাগতম! | অ্যারো কি ব্যবহার করে চ্যানেল পরিবর্তন করুন | কপিরাইট © আজিজুল হক কাওসার
+    </marquee>
+</div>
 
-        // আপনার JSON এর ডাটা এখানে সরাসরি বসিয়ে দিন
-        const channels = [
-            { "name": "চ্যানেল ১", "logo": "https://via.placeholder.com/50", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
-            { "name": "চ্যানেল ২", "logo": "https://via.placeholder.com/50", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
-            { "name": "চ্যানেল ৩", "logo": "https://via.placeholder.com/50", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
-        ];
+<div class="grid" id="grid"></div>
 
-        function renderChannels() {
-            list.innerHTML = '';
-            channels.forEach(ch => {
-                const div = document.createElement('div');
-                div.className = 'channel-item';
-                div.innerHTML = `<img src="${ch.logo}" class="channel-logo"><span>${ch.name}</span>`;
-                div.onclick = () => playVideo(ch.url);
-                list.appendChild(div);
-            });
-        }
+<footer>কপিরাইট © আজিজুল হক কাওসার</footer>
 
-        function playVideo(url) {
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(url);
-                hls.attachMedia(video);
-                video.play();
-            } else { video.src = url; }
-        }
+<script>
+    let channels = [];
+    
+    // ডাটা লোড
+    fetch('channels.json')
+        .then(r => r.json())
+        .then(d => {
+            channels = d;
+            renderChannels(d);
+        });
 
-        renderChannels();
-    </script>
+    function renderChannels(data) {
+        document.getElementById('grid').innerHTML = data.map(c => `
+            <div class="card" onclick="play('${c.url}')">
+                <img src="${c.logo}" width="50" style="border-radius:50%">
+                <div style="font-size:12px; margin-top:8px;">${c.name}</div>
+            </div>`).join('');
+    }
+
+    function play(url) {
+        const v = document.getElementById('videoPlayer');
+        v.muted = false;
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(v);
+        v.play();
+    }
+    
+    function search() {
+        let val = document.getElementById('search').value.toLowerCase();
+        let filtered = channels.filter(c => c.name.toLowerCase().includes(val));
+        renderChannels(filtered);
+    }
+</script>
 </body>
 </html>

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="bn">
-<head> <link rel="icon" type="image/x-icon" href="https://i.ibb.co/wN3NPjL8/Adobe-Express-file-1.png"> <link rel="manifest" href="manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Bangla Prime TV">
+<head>
+    <link rel="icon" type="image/x-icon" href="https://i.ibb.co/wN3NPjL8/Adobe-Express-file-1.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Bangla Prime TV">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bangla Prime TV</title>
@@ -54,29 +56,27 @@
             <div class="watermark">Bangla Prime TV By Kawsar</div>
         </div>
         <div class="ticker-box">
-            <div class="ticker-text">স্গ্লোবাল কানেক্টিভিটি, লোকাল এন্টারটেইনমেন্ট - Bangla Prime TV, সব সময় আপনাদের পাশে। আপনার পছন্দের টিভি চ্যানেলগুলো এখন হাতের মুঠোয়। যেকোনো সমস্যা বা আপডেটের জন্য আমাদের সাথেই থাকুন।</div>
+            <div class="ticker-text">গ্লোবাল কানেক্টিভিটি, লোকাল এন্টারটেইনমেন্ট - Bangla Prime TV, সব সময় আপনাদের পাশে। আপনার পছন্দের টিভি চ্যানেলগুলো এখন হাতের মুঠোয়। যেকোনো সমস্যা বা আপডেটের জন্য আমাদের সাথেই থাকুন।</div>
         </div>
         <div class="mobile-grid" id="mobile-grid"></div>
     </div>
 </div>
 
 <script>
-    // Wake Lock API: মোবাইল স্ক্রিন অন রাখার জন্য
+    // Wake Lock API
     async function keepScreenOn() {
         try {
             const wakeLock = await navigator.wakeLock.request('screen');
-            wakeLock.addEventListener('release', () => {
-                console.log('Screen Wake Lock released');
-            });
-        } catch (err) {
-            console.error(`${err.name}, ${err.message}`);
-        }
+            wakeLock.addEventListener('release', () => console.log('Screen Wake Lock released'));
+        } catch (err) { console.error(`${err.name}, ${err.message}`); }
     }
 
-    // প্রথম ইউজার ইন্টারঅ্যাকশনে সক্রিয় হবে
-    document.addEventListener('click', () => {
-        keepScreenOn();
-    }, { once: true });
+    document.addEventListener('click', () => { keepScreenOn(); }, { once: true });
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
 
     let channelData = [];
     fetch('channels.json')
@@ -113,11 +113,7 @@
             hls.attachMedia(video);
             hls.play();
         }
-    } 
-  }
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js'); </script>
+    }
 </script>
 </body>
 </html>

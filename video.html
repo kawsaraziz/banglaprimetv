@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Player</title>
+    <style>
+        body { background: #000; margin: 0; }
+        .vid-container { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; }
+        .vid-item { height: 100vh; scroll-snap-align: start; display: flex; align-items: center; position: relative; }
+        video { width: 100%; }
+        .rotate-btn { position: absolute; top: 20px; right: 20px; color: white; cursor: pointer; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="video-feed" class="vid-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        fetch('channels.json').then(r => r.json()).then(data => {
+            data.forEach((ch, i) => {
+                document.getElementById('video-feed').innerHTML += `
+                    <div class="vid-item">
+                        <video id="v-${i}" playsinline></video>
+                        <i class="fas fa-expand rotate-btn" onclick="goLandscape('v-${i}')"></i>
+                    </div>`;
+                const v = document.getElementById(`v-${i}`);
+                const hls = new Hls(); hls.loadSource(ch.url); hls.attachMedia(v);
+            });
+        });
+        function goLandscape(id) {
+            const v = document.getElementById(id);
+            v.requestFullscreen();
+            if(screen.orientation) screen.orientation.lock('landscape');
+        }
+    </script>
+</body>
+</html>

@@ -1,48 +1,21 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Torongo Plus Style</title>
-    <style>
-        body { background: #000; color: #fff; text-align: center; font-family: sans-serif; }
-        .logo { width: 200px; margin: 20px 0; cursor: pointer; }
-        #channel-logo { width: 100px; height: 100px; background: #333; margin: 20px auto; display: flex; align-items: center; justify-content: center; }
-        .controls { margin-top: 20px; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bangla Prime TV</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
-
-    <a href="https://torongoplus.vercel.app/">
-        <img src="logo.png" alt="Torongo Logo" class="logo">
-    </a>
-
-    <div id="channel-logo">চ্যানেল লোগো</div>
-    <h2 id="channel-name">চ্যানেল নাম</h2>
-
-    <div class="controls">
-        অ্যারো বাটন (← →) ব্যবহার করে চ্যানেল পরিবর্তন করুন
-    </div>
-
-<script>
-    const channels = [
-        { name: "Channel 1", logo: "logo1.png" },
-        { name: "Channel 2", logo: "logo2.png" }
-    ];
-    let currentIndex = 0;
-
-    function updateChannel(index) {
-        currentIndex = (index + channels.length) % channels.length;
-        document.getElementById("channel-name").innerText = channels[currentIndex].name;
-        document.getElementById("channel-logo").innerText = channels[currentIndex].name; // এখানে ইমেজ সোর্স সেট করতে পারেন
-    }
-
-    // অ্যারো বাটন কন্ট্রোল
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "ArrowRight") updateChannel(currentIndex + 1);
-        if (e.key === "ArrowLeft") updateChannel(currentIndex - 1);
-    });
-
-    updateChannel(0);
-</script>
+<header><h1>Bangla Prime TV</h1><input id="search" placeholder="Search channel"></header>
+<div class="container">
+<div class="player">
+<video id="video" controls autoplay></video>
+<h2 id="title">Select a channel</h2>
+</div>
+<div id="channels" class="channels"></div>
+</div>
+<script src="app.js"></script>
 </body>
 </html>

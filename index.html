@@ -10,22 +10,23 @@
     <style>
         body { background: #000; margin: 0; overflow: hidden; font-family: sans-serif; }
         .snap-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .snap-item { height: 100vh; scroll-snap-align: start; position: relative; display: flex; align-items: center; justify-content: center; }
-        .overlay { position: absolute; bottom: 80px; left: 20px; color: white; z-index: 10; width: 80%; }
-        .actions { position: absolute; bottom: 100px; right: 15px; color: white; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
-        .logo-gradient { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .snap-item { height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        
+        video {
+            width: 90%; height: 60%; object-fit: contain;
+            background: #111; border-radius: 12px; cursor: pointer;
+        }
+
+        .info { position: absolute; bottom: 100px; left: 20px; color: white; width: 70%; }
+        .actions { position: absolute; bottom: 100px; right: 15px; color: white; display: flex; flex-direction: column; gap: 20px; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; padding: 15px; background: #000; color: white; font-size: 24px; z-index: 50; }
     </style>
 </head>
 <body>
 
-    <header class="fixed top-0 w-full p-4 z-50 flex justify-between items-center bg-transparent">
-        <h1 class="text-2xl font-bold logo-gradient">Bangla Prime</h1>
-        <i class="fas fa-volume-up text-white" id="mute-btn"></i>
-    </header>
-
     <div id="app" class="snap-container"></div>
 
-    <nav class="fixed bottom-0 w-full flex justify-around p-4 bg-black/80 border-t border-gray-800 text-white text-xl z-50">
+    <nav class="nav-bar">
         <i class="fas fa-home"></i>
         <i class="fas fa-search"></i>
         <i class="fas fa-plus-square"></i>
@@ -34,49 +35,51 @@
     </nav>
 
     <script>
-        async function loadData() {
-            try {
-                const res = await fetch('channels.json');
-                const channels = await res.json();
-                const app = document.getElementById('app');
+        async function loadContent() {
+            const res = await fetch('channels.json');
+            const channels = await res.json();
+            const app = document.getElementById('app');
 
-                channels.forEach((ch, index) => {
-                    const div = document.createElement('div');
-                    div.className = "snap-item";
-                    div.innerHTML = `
-                        <video id="v-${index}" class="w-full h-full object-cover" playsinline muted></video>
-                        <div class="overlay">
-                            <h2 class="font-bold text-lg">${ch.name}</h2>
-                            <p class="text-sm opacity-70">আপনার প্রিয় টিভি চ্যানেলটি দেখুন সরাসরি বাংলা প্রাইম এ।</p>
-                        </div>
-                        <div class="actions text-center">
-                            <i class="fas fa-heart"></i><span class="block text-[10px]">৯৯</span>
-                            <i class="fas fa-comment"></i><span class="block text-[10px]">৫</span>
-                            <i class="fas fa-share"></i><span class="block text-[10px]">২</span>
-                        </div>
-                    `;
-                    app.appendChild(div);
+            channels.forEach((ch, index) => {
+                const div = document.createElement('div');
+                div.className = "snap-item";
+                div.innerHTML = `
+                    <div class="flex items-center self-start ml-5 mb-2 text-white font-bold">
+                        <i class="fas fa-user-circle text-3xl mr-2"></i> ${ch.name}
+                    </div>
+                    <video id="v-${index}" playsinline muted></video>
+                    <div class="info">
+                        <h2 class="font-bold">${ch.name}</h2>
+                        <p class="text-xs opacity-70">লাইভ সম্প্রচার চলছে... #BanglaPrime</p>
+                    </div>
+                    <div class="actions">
+                        <i class="fas fa-heart text-2xl"></i><span>369</span>
+                        <i class="fas fa-comment text-2xl"></i><span>6</span>
+                        <i class="fas fa-share text-2xl"></i><span>16</span>
+                    </div>
+                `;
+                app.appendChild(div);
 
-                    const video = document.getElementById(`v-${index}`);
-                    const hls = new Hls();
-                    hls.loadSource(ch.url);
-                    hls.attachMedia(video);
+                const video = document.getElementById(`v-${index}`);
+                const hls = new Hls();
+                hls.loadSource(ch.url);
+                hls.attachMedia(video);
+
+                video.addEventListener('dblclick', () => {
+                    if (video.requestFullscreen) video.requestFullscreen();
+                    if (screen.orientation) screen.orientation.lock('landscape');
                 });
+            });
 
-                document.getElementById('mute-btn').addEventListener('click', () => {
-                    document.querySelectorAll('video').forEach(v => v.muted = !v.muted);
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if (e.isIntersecting) v.play(); else v.pause();
                 });
-
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(e => {
-                        const v = e.target.querySelector('video');
-                        if (e.isIntersecting) v.play(); else v.pause();
-                    });
-                }, { threshold: 0.7 });
-                document.querySelectorAll('.snap-item').forEach(i => observer.observe(i));
-            } catch (err) { alert("ফাইল লোড হচ্ছে না। 'Live Server' ব্যবহার করছেন তো?"); }
+            }, { threshold: 0.6 });
+            document.querySelectorAll('.snap-item').forEach(i => observer.observe(i));
         }
-        loadData();
+        loadContent();
     </script>
 </body>
 </html>

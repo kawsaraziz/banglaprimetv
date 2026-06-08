@@ -7,21 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { background: #000; margin: 0; overflow: hidden; font-family: sans-serif; }
-        .snap-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .snap-item { height: 100vh; scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        
-        video {
-            width: 90%; height: 60%; object-fit: contain;
-            background: #111; border-radius: 12px; cursor: pointer;
-        }
-
-        .info { position: absolute; bottom: 100px; left: 20px; color: white; width: 70%; }
-        .actions { position: absolute; bottom: 100px; right: 15px; color: white; display: flex; flex-direction: column; gap: 20px; }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; padding: 15px; background: #000; color: white; font-size: 24px; z-index: 50; }
-    </style>
-</head>
+    <link rel="stylesheet" href="style.css"> </head>
 <body>
 
     <div id="app" class="snap-container"></div>
@@ -35,7 +21,7 @@
     </nav>
 
     <script>
-        async function loadContent() {
+        async function init() {
             const res = await fetch('channels.json');
             const channels = await res.json();
             const app = document.getElementById('app');
@@ -50,12 +36,11 @@
                     <video id="v-${index}" playsinline muted></video>
                     <div class="info">
                         <h2 class="font-bold">${ch.name}</h2>
-                        <p class="text-xs opacity-70">লাইভ সম্প্রচার চলছে... #BanglaPrime</p>
+                        <p class="text-xs opacity-70">লাইভ সম্প্রচার দেখুন #BanglaPrime</p>
                     </div>
                     <div class="actions">
                         <i class="fas fa-heart text-2xl"></i><span>369</span>
                         <i class="fas fa-comment text-2xl"></i><span>6</span>
-                        <i class="fas fa-share text-2xl"></i><span>16</span>
                     </div>
                 `;
                 app.appendChild(div);
@@ -71,15 +56,15 @@
                 });
             });
 
-            const observer = new IntersectionObserver((entries) => {
+            const obs = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
                     const v = e.target.querySelector('video');
                     if (e.isIntersecting) v.play(); else v.pause();
                 });
             }, { threshold: 0.6 });
-            document.querySelectorAll('.snap-item').forEach(i => observer.observe(i));
+            document.querySelectorAll('.snap-item').forEach(i => obs.observe(i));
         }
-        loadContent();
+        init();
     </script>
 </body>
 </html>

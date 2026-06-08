@@ -1,227 +1,116 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><link rel="stylesheet" href="css/styles-guPHpvuR.css" data-precedence="default"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap" data-precedence="default"><title>NAHIDFLIX — Premium Live TV Streaming</title><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="NAHIDFLIX — Premium Live TV"><meta name="twitter:description" content="Watch 1200+ live TV channels in HD on NAHIDFLIX."><meta property="og:image" content="images/social-1780934375865-1000093119.webp"><meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/wwKkO1dBe9S7HvEI6KYgqUfHrED3/social-images/social-1780934375865-1000093119.webp"><meta name="description" content="Watch 1200+ live TV channels in HD. Bangla, Sports, News, Movies, Kids, Music and more on NAHIDFLIX."><meta property="og:title" content="NAHIDFLIX — Premium Live TV Streaming"><meta property="og:description" content="1200+ live channels. Stream Bangla, Sports, News and more in HD."><meta property="og:type" content="website"><meta name="theme-color" content="#000000"><link rel="modulepreload" href="/assets/index-bbEMYRY6.js"><link rel="modulepreload" href="/assets/index-D23NqxNl.js"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="manifest" href="/manifest.webmanifest"><link rel="icon" href="images/favicon.svg" type="image/svg+xml">
-<style>
-	@font-face {
-		font-family: 'CameraPlainVariable';
-		src: url('fonts/CameraPlainVariable.woff2') format('woff2');
-		font-weight: 100 900;
-		font-style: normal;
-		font-display: swap;
-	}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangla Prime TV</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #000; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-	#lovable-badge {
-		--badge-bg: #1b1b1b;
-		--badge-text: #c5c1b9;
-		--badge-text-hover: #dcdad5;
-		--badge-radius: 6px;
-		--badge-padding: 8px;
-		--badge-gap: 6px;
-		--badge-shadow: 
-			0 0 0 1px rgba(0, 0, 0, 0.88),
-			0 1px 0 0 rgba(0, 0, 0, 0.04),
-			0 2px 2px -1px rgba(0, 0, 0, 0.08),
-			0 4px 4px -2px rgba(0, 0, 0, 0.08),
-			0 8px 8px -4px rgba(0, 0, 0, 0.08),
-			0 16px 16px -8px rgba(0, 0, 0, 0.08);
-		--badge-transition-duration: 0.2s;
-		--badge-transition-easing: cubic-bezier(0.16, 1, 0.32, 1);
-		--focus-color: #575ECF;
-		--focus-offset: 2px;
-		--focus-width: 2px;
-		
-		position: fixed;
-		bottom: 12px;
-		right: 12px;
-		height: 24px;
-		display: flex;
-		align-items: center;
-		z-index: 1000000;
-		background-color: var(--badge-bg) !important;
-		color: var(--badge-text) !important;
-		border-radius: var(--badge-radius);
-		box-shadow: var(--badge-shadow) !important;
-		font-size: 12px;
-		font-family: CameraPlainVariable, "CameraPlainVariable Fallback", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-		font-weight: 400 !important;
-		text-transform: none !important;
-		font-feature-settings: normal !important;
-		transform: translateZ(0);
-		will-change: transform, opacity;
-	}
+        header { background: #111; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo-img { width: 100px; }
+        .search-box input { background: #222; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 15px; width: 150px; }
 
-	#lovable-badge-cta {
-		display: flex;
-		align-items: center;
-		gap: var(--badge-gap);
-		padding: 0 var(--badge-padding);
-		height: 100%;
-		color: inherit;
-		text-decoration: none;
-		white-space: nowrap;
-		border-radius: var(--badge-radius) 0 0 var(--badge-radius);
-		transition: 
-			background-color var(--badge-transition-duration) ease,
-			color var(--badge-transition-duration) ease,
-			transform 0.1s ease;
-	}
+        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
+        .sidebar { width: 300px; background: #111; overflow-y: auto; padding: 10px; border-right: 1px solid #333; }
+        
+        .player-wrapper { flex: 1; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
+        .player-container { width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; overflow: hidden; }
+        video { width: 100%; height: 100%; }
 
-	#lovable-badge-cta:hover {
-		background: rgba(255, 255, 255, 0.04);
-		color: var(--badge-text-hover);
-	}
+        .watermark { position: absolute; top: 10%; left: 10%; color: rgba(255, 255, 255, 0.3); font-size: 20px; animation: move 10s linear infinite alternate; pointer-events: none; z-index: 10; }
+        .ticker-box { margin-top: 10px; background: #1a1a1a; padding: 8px; border-radius: 20px; overflow: hidden; white-space: nowrap; border: 1px solid #444; }
+        .ticker-text { display: inline-block; padding-left: 100%; animation: ticker 20s linear infinite; }
 
-	#lovable-badge-cta:active {
-		transform: scale(0.98);
-	}
+        .mobile-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; overflow-y: auto; flex: 1; padding: 5px; }
 
-	#lovable-badge-cta:focus {
-		outline: none;
-	}
+        @keyframes ticker { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+        @keyframes move { from { top: 10%; left: 10%; } to { top: 70%; left: 60%; } }
 
-	#lovable-badge-cta:focus-visible {
-		outline: var(--focus-width) solid var(--focus-color);
-		outline-offset: var(--focus-offset);
-		z-index: 1;
-	}
+        @media (max-width: 768px) {
+            .main-wrapper { flex-direction: column; }
+            .sidebar { display: none; }
+            .mobile-grid { display: grid; }
+        }
+    </style>
+</head>
+<body>
 
-	#lovable-badge-text {
-		line-height: 1;
-	}
+<header>
+    <img src="https://via.placeholder.com/150x50?text=LOGO" class="logo-img">
+    <div class="search-box"><input type="text" id="search" placeholder="Search..." onkeyup="filterChannels()"></div>
+</header>
 
-	#lovable-badge-divider {
-		width: 1px;
-		height: 24px;
-		background-color: rgba(255, 255, 255, 0.04);
-		flex-shrink: 0;
-	}
+<div class="main-wrapper">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="player-wrapper">
+        <div class="player-container">
+            <video id="video-player" controls autoplay playsinline></video>
+            <div class="watermark">Bangla Prime TV By Kawsar</div>
+        </div>
+        <div class="ticker-box">
+            <div class="ticker-text">স্বাগতম! বর্তমানে নাহাল (Nakhal) এর তাপমাত্রা ৪২°C। আমাদের সাথেই থাকুন।</div>
+        </div>
+        <div class="mobile-grid" id="mobile-grid"></div>
+    </div>
+</div>
 
-	#lovable-badge-close {
-		width: 24px;
-		height: 24px;
-		min-width: 24px;
-		min-height: 24px;
-		cursor: pointer;
-		background: none;
-		border: none;
-		padding: 0;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 0 var(--badge-radius) var(--badge-radius) 0;
-		flex-shrink: 0;
-		transition: 
-			background-color var(--badge-transition-duration) ease,
-			transform 0.1s ease;
-	}
-
-	#lovable-badge-close:hover {
-		background: rgba(255, 255, 255, 0.04);
-	}
-
-	#lovable-badge-close:active {
-		transform: scale(0.92);
-	}
-
-	#lovable-badge-close:focus {
-		outline: none;
-	}
-
-	#lovable-badge-close:focus-visible {
-		outline: var(--focus-width) solid var(--focus-color);
-		outline-offset: calc(var(--focus-offset) * -1);
-		z-index: 1;
-	}
-
-	#lovable-badge-close svg path {
-		fill: var(--badge-text);
-		transition: fill var(--badge-transition-duration) ease;
-	}
-
-	#lovable-badge-close:hover svg path {
-		fill: var(--badge-text-hover);
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		#lovable-badge-cta,
-		#lovable-badge-close,
-		#lovable-badge-close svg path {
-			transition: none;
-		}
-		
-		#lovable-badge-cta:active,
-		#lovable-badge-close:active {
-			transform: none;
-		}
-	}
-
-	@media (prefers-contrast: high) {
-		#lovable-badge {
-			--badge-bg: #000;
-			--badge-text: #fff;
-			--badge-text-hover: #fff;
-			border: 2px solid currentColor;
-		}
-		
-		#lovable-badge-cta:focus-visible,
-		#lovable-badge-close:focus-visible {
-			outline-width: 3px;
-		}
-	}
-</style>
-<script defer="" src="js/~flock.js" data-proxy-url="/~api/analytics"></script><script defer="" src="js/events.js" data-artifact-kind="dwl_content_hash" data-artifact-id="2ea4045780d3b47f18a8104f697389ad1fe7919e4541800a656f1bca11c21ced" data-commit-sha="3fc571b1003da1b37514c8bd5a2f540f9f5452f6" data-context-token="v1.eyJwcm9qZWN0X2lkIjoiM2U5ODFmOTctY2E0Mi00MTFhLThiNjAtNGQ2MWI5OWM4MmRlIiwiYXJ0aWZhY3Rfa2luZCI6ImR3bF9jb250ZW50X2hhc2giLCJhcnRpZmFjdF9pZCI6IjJlYTQwNDU3ODBkM2I0N2YxOGE4MTA0ZjY5NzM4OWFkMWZlNzkxOWU0NTQxODAwYTY1NmYxYmNhMTFjMjFjZWQiLCJjb21taXRfc2hhIjoiM2ZjNTcxYjEwMDNkYTFiMzc1MTRjOGJkNWEyZjU0MGY5ZjU0NTJmNiIsImV4cCI6MTc4MDk0NTU4Mn0.chCrUwVxr8kWGTcLrEapSU1-Zj3QbpgUJiMGV08yM9k"></script></head><body><!--$--><div class="min-h-screen pb-24 lg:pb-12"><header class="sticky top-0 z-40 glass-strong border-b border-white/5"><div class="flex items-center gap-3 px-4 sm:px-6 h-16"><button class="lg:hidden rounded-md p-2 hover:bg-white/10" aria-label="Menu"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><a href="/" class="brand-text text-2xl sm:text-3xl font-black select-none">NAHIDFLIX</a><div class="ml-auto flex items-center gap-2 flex-1 max-w-md"><div class="relative flex-1"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg><input placeholder="Search 1200+ channels…" class="w-full rounded-full glass border-0 pl-9 pr-3 py-2 text-sm outline-none ring-1 ring-white/10 focus:ring-primary transition" value=""></div></div></div><div class="flex gap-2 px-4 sm:px-6 pb-3 overflow-x-auto hide-scrollbar"><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition bg-primary text-primary-foreground shadow-[0_8px_20px_-8px_rgba(220,38,38,0.7)]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tv h-3.5 w-3.5"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>All</button><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition glass hover:bg-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-languages h-3.5 w-3.5"><path d="m5 8 6 6"></path><path d="m4 14 6-6 2-3"></path><path d="M2 5h12"></path><path d="M7 2h1"></path><path d="m22 22-5-10-5 10"></path><path d="M14 18h6"></path></svg>Bangla</button><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition glass hover:bg-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trophy h-3.5 w-3.5"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>Sports</button><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition glass hover:bg-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-newspaper h-3.5 w-3.5"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>News</button><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition glass hover:bg-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-baby h-3.5 w-3.5"><path d="M9 12h.01"></path><path d="M15 12h.01"></path><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"></path><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"></path></svg>Kids</button><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition glass hover:bg-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-music2 h-3.5 w-3.5"><circle cx="8" cy="18" r="4"></circle><path d="M12 18V2l7 4"></path></svg>Music</button><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition glass hover:bg-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-globe h-3.5 w-3.5"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>English</button><button class="flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition glass hover:bg-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-film h-3.5 w-3.5"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M7 3v18"></path><path d="M3 7.5h4"></path><path d="M3 12h18"></path><path d="M3 16.5h4"></path><path d="M17 3v18"></path><path d="M17 7.5h4"></path><path d="M17 16.5h4"></path></svg>Movies</button></div></header><div class="flex"><aside class="hidden lg:flex sticky top-[7.5rem] h-[calc(100vh-7.5rem)] w-56 flex-col gap-1 p-4 border-r border-white/5"><button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house h-4 w-4"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> <!-- -->Home</button><button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart h-4 w-4"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg> <!-- -->Favorites</button><button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock h-4 w-4"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> <!-- -->Recent</button><button class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star h-4 w-4"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg> <!-- -->All Channels</button><div class="mt-auto rounded-xl glass p-4"><p class="text-xs text-muted-foreground mb-1">Library</p><p class="text-2xl font-bold">0</p><p class="text-xs text-muted-foreground">channels available</p></div></aside><main class="flex-1 min-w-0 space-y-8 pt-6"><section class="px-4 sm:px-6"><div class="relative aspect-video w-full overflow-hidden rounded-2xl glass-strong flex items-center justify-center"><div class="text-center px-6"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-radio mx-auto h-12 w-12 text-muted-foreground mb-3"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path><circle cx="12" cy="12" r="2"></circle><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"></path></svg><p class="text-lg font-semibold">Select a channel to start watching</p><p class="text-sm text-muted-foreground">1200+ live channels available</p></div></div></section><div class="space-y-8"><div class="space-y-3"><div class="h-5 w-48 skeleton rounded mx-4 sm:mx-6"></div><div class="flex gap-3 sm:gap-4 px-4 sm:px-6 overflow-hidden"><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div></div></div><div class="space-y-3"><div class="h-5 w-48 skeleton rounded mx-4 sm:mx-6"></div><div class="flex gap-3 sm:gap-4 px-4 sm:px-6 overflow-hidden"><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div></div></div><div class="space-y-3"><div class="h-5 w-48 skeleton rounded mx-4 sm:mx-6"></div><div class="flex gap-3 sm:gap-4 px-4 sm:px-6 overflow-hidden"><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div><div class="w-[160px] sm:w-[180px] flex-shrink-0 rounded-xl overflow-hidden glass"><div class="aspect-video skeleton"></div><div class="p-2.5 space-y-2"><div class="h-3 skeleton rounded"></div><div class="h-2 w-1/2 skeleton rounded"></div></div></div></div></div></div><footer class="px-4 sm:px-6 pt-12 pb-4 text-center text-xs text-muted-foreground"><p class="brand-text text-xl font-black">NAHIDFLIX</p><p class="mt-1">Premium Live TV · <!-- -->0<!-- --> channels</p></footer></main></div><nav class="lg:hidden fixed bottom-0 inset-x-0 z-30 glass-strong border-t border-white/5 grid grid-cols-4 gap-1 px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"><button class="flex flex-col items-center gap-0.5 rounded-lg py-1.5 text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-white/5 transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house h-5 w-5"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>Home</button><button class="flex flex-col items-center gap-0.5 rounded-lg py-1.5 text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-white/5 transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search h-5 w-5"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>Search</button><button class="flex flex-col items-center gap-0.5 rounded-lg py-1.5 text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-white/5 transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-heart h-5 w-5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>Favs</button><button class="flex flex-col items-center gap-0.5 rounded-lg py-1.5 text-[10px] font-semibold text-muted-foreground hover:text-foreground hover:bg-white/5 transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu h-5 w-5"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>Menu</button></nav></div><!--/$--><script type="module" async="">import("/assets/index-bbEMYRY6.js")</script>
-<aside id="lovable-badge" role="complementary" dir="ltr" lang="en" aria-label="Edit with Lovable">
-	<a id="lovable-badge-cta" target="_blank" href="https://lovable.dev/projects/3e981f97-ca42-411a-8b60-4d61b99c82de?utm_source=lovable-badge" rel="noopener nofollow" aria-label="Edit with Lovable">
-		<span id="lovable-badge-text">Edit with</span>
-		<svg xmlns="http://www.w3.org/2000/svg" width="52" height="16" fill="none" viewBox="0 0 52 16">
-  <path fill="#FCFBF8" fill-rule="evenodd" d="M20.318 5.25c.643 0 1.206.14 1.69.418a2.81 2.81 0 0 1 1.118 1.191c.266.513.4 1.115.4 1.807s-.134 1.296-.4 1.812a2.81 2.81 0 0 1-1.118 1.193c-.484.278-1.047.418-1.69.418s-1.208-.14-1.695-.418a2.85 2.85 0 0 1-1.125-1.193c-.262-.516-.393-1.12-.393-1.812s.131-1.294.393-1.807a2.848 2.848 0 0 1 1.125-1.191c.487-.279 1.052-.418 1.695-.418Zm0 1.425c-.27 0-.504.076-.7.228-.193.147-.34.37-.443.67-.102.295-.153.66-.153 1.093 0 .435.05.801.153 1.1.102.3.25.524.443.676.196.147.43.22.7.22.27 0 .502-.073.694-.22.193-.152.341-.375.443-.67.103-.299.153-.667.153-1.106 0-.65-.112-1.145-.337-1.481a1.08 1.08 0 0 0-.953-.51ZM32.7 5.25c.61 0 1.127.1 1.549.3.422.197.74.48.953.849.217.368.325.809.325 1.32v2.704c0 .29.02.562.062.812.044.245.108.4.19.466V12h-1.935a5.895 5.895 0 0 1-.105-.684 7.745 7.745 0 0 1-.02-.228 2.293 2.293 0 0 1-.151.203c-.205.242-.47.437-.793.584-.32.143-.685.215-1.094.215-.406 0-.77-.08-1.094-.24a1.845 1.845 0 0 1-.756-.682 1.984 1.984 0 0 1-.27-1.045c0-.606.178-1.069.535-1.388.356-.324.87-.534 1.542-.633l1.125-.16c.225-.032.403-.074.534-.123a.622.622 0 0 0 .288-.196.549.549 0 0 0 .093-.327.65.65 0 0 0-.11-.367.702.702 0 0 0-.32-.27c-.14-.07-.31-.105-.51-.105-.32 0-.576.083-.768.251-.193.164-.298.39-.314.676h-1.923c.016-.434.147-.82.393-1.155.25-.34.596-.604 1.039-.792.442-.189.954-.283 1.535-.283Zm.99 3.498a.98.98 0 0 1-.215.14 2.49 2.49 0 0 1-.584.178l-.473.092c-.315.061-.553.156-.713.283-.155.127-.233.305-.233.534 0 .23.084.412.252.547.168.135.383.203.645.203s.494-.058.694-.173c.201-.118.355-.282.461-.49.11-.21.166-.448.166-.714v-.6Zm4.526-2.375c.065-.125.138-.243.221-.349.197-.25.437-.44.719-.571.282-.135.6-.203.952-.203.528 0 .988.138 1.377.412.389.275.688.67.896 1.186.21.512.314 1.12.314 1.824 0 .7-.107 1.309-.32 1.825-.213.512-.518.906-.915 1.18-.393.275-.854.412-1.383.412-.352 0-.667-.062-.946-.184a1.832 1.832 0 0 1-.7-.554 2.2 2.2 0 0 1-.234-.383V12h-1.843V3h1.862v3.373Zm1.284.296c-.274 0-.51.085-.707.253-.192.163-.338.397-.436.7a3.376 3.376 0 0 0-.148 1.05c0 .406.05.759.148 1.058.098.299.243.53.436.694.197.164.433.246.707.246.279 0 .512-.082.7-.246.193-.164.336-.395.43-.694.099-.3.148-.652.148-1.058 0-.405-.05-.757-.147-1.056-.095-.299-.238-.53-.43-.694a1.015 1.015 0 0 0-.7-.253Zm9.416-1.419c.602 0 1.136.131 1.604.393.466.262.829.643 1.086 1.143.263.5.394 1.097.394 1.794 0 .25-.002.449-.006.596H47.51c.018.288.071.538.164.75a1.3 1.3 0 0 0 .491.596c.214.13.465.196.757.196.319 0 .583-.082.792-.246.209-.167.34-.403.393-.706h1.862a2.48 2.48 0 0 1-.485 1.235 2.54 2.54 0 0 1-1.051.805c-.439.188-.949.283-1.53.283-.655 0-1.225-.125-1.708-.375a2.672 2.672 0 0 1-1.13-1.143c-.267-.508-.4-1.137-.4-1.887 0-.712.14-1.327.418-1.843a2.86 2.86 0 0 1 1.155-1.186c.491-.27 1.051-.405 1.678-.405Zm-.044 1.345c-.274 0-.516.068-.725.203a1.29 1.29 0 0 0-.479.59 2.045 2.045 0 0 0-.132.498h2.562a1.873 1.873 0 0 0-.138-.602 1.061 1.061 0 0 0-.418-.516 1.243 1.243 0 0 0-.67-.173Z" clip-rule="evenodd"></path>
-  <path fill="#FCFBF8" d="m26.605 9.995 1.342-4.566h1.924L27.628 12h-2.07l-2.33-6.57h1.98l1.397 4.565Zm-13.013.143h2.256c1.632 0 1.421 1.837 1.418 1.861h-5.603V3h1.93v7.138Zm31.516 1.861h-1.862V3h1.862v8.999Z"></path>
-  <path fill="url(#a)" fill-rule="evenodd" d="M2.7 3c1.492 0 2.7 1.192 2.7 2.663v1.012h.9c1.49 0 2.7 1.192 2.7 2.662S7.791 12 6.3 12H0V5.663C0 4.193 1.209 3 2.7 3Z" clip-rule="evenodd"></path>
-  <defs>
-    <radialGradient id="a" cx="0" cy="0" r="1" gradientTransform="matrix(-1.54236 7.07838 -10.231 -2.15602 4.627 5.022)" gradientUnits="userSpaceOnUse">
-      <stop offset=".106" stop-color="#FE7B02"></stop>
-      <stop offset=".394" stop-color="#FE3F21"></stop>
-      <stop offset=".608" stop-color="#F858BC"></stop>
-      <stop offset=".929" stop-color="#575ECF"></stop>
-    </radialGradient>
-  </defs>
-</svg>
-
-
-	</a>
-	
-	<span id="lovable-badge-divider" aria-hidden="true"></span>
-	
-	<button id="lovable-badge-close" aria-label="Dismiss" title="Dismiss" type="button">
-		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16" aria-hidden="true">
-			<path d="M10.646 4.646a.5.5 0 1 1 .707.708L8.707 8l2.646 2.646a.5.5 0 1 1-.707.707L8 8.707l-2.646 2.646a.5.5 0 1 1-.708-.707L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708L8 7.293l2.646-2.647Z"></path>
-		</svg>
-	</button>
-</aside>
 <script>
-	// Don't show the lovable-badge if the page is in an iframe or if it's being rendered by puppeteer (screenshot service)
-	if (window.self !== window.top || navigator.userAgent.includes('puppeteer')) {
-		// the page is in an iframe
-		var badge = document.getElementById('lovable-badge');
-		if (badge) {
-			badge.style.display = 'none';
-		}
-	}
+    // Wake Lock API: মোবাইল স্ক্রিন অন রাখার জন্য
+    async function keepScreenOn() {
+        try {
+            const wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => {
+                console.log('Screen Wake Lock released');
+            });
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
+    }
 
-	// Add click event listener to close button with animation
-	var closeButton = document.getElementById('lovable-badge-close');
-	if (closeButton) {
-		closeButton.addEventListener('click', function(event) {
-			event.preventDefault();
-			event.stopPropagation();
-			var badge = document.getElementById('lovable-badge');
-			if (badge) {
-				badge.classList.add('closing');
-				setTimeout(function() {
-					if (badge) {
-						badge.style.display = 'none';
-					}
-				}, 240);
-			}
-		});
-	}
+    // প্রথম ইউজার ইন্টারঅ্যাকশনে সক্রিয় হবে
+    document.addEventListener('click', () => {
+        keepScreenOn();
+    }, { once: true });
+
+    let channelData = [];
+    fetch('channels.json')
+    .then(r => r.json())
+    .then(data => {
+        channelData = data;
+        renderChannels(data);
+    });
+
+    function renderChannels(data) {
+        const sidebar = document.getElementById('sidebar');
+        const grid = document.getElementById('mobile-grid');
+        sidebar.innerHTML = ''; grid.innerHTML = '';
+        
+        data.forEach(c => {
+            const itemHTML = `<div onclick="play('${c.url}')" style="cursor:pointer; padding:10px; border-bottom:1px solid #333; display:flex; align-items:center;">
+                <img src="${c.logo}" width="30" style="margin-right:8px;"> ${c.name}</div>`;
+            sidebar.innerHTML += itemHTML;
+            grid.innerHTML += `<div onclick="play('${c.url}')" style="text-align:center; background:#1a1a1a; padding:8px; border-radius:5px;">
+                <img src="${c.logo}" width="35"><div style="font-size:11px; margin-top:5px;">${c.name}</div></div>`;
+        });
+    }
+
+    function filterChannels() {
+        const query = document.getElementById('search').value.toLowerCase();
+        renderChannels(channelData.filter(c => c.name.toLowerCase().includes(query)));
+    }
+
+    function play(url) {
+        const video = document.getElementById('video-player');
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            hls.play();
+        }
+    }
 </script>
-</body></html>
+</body>
+</html>

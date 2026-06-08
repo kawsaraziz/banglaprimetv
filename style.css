@@ -1,26 +1,26 @@
 <style>
-    body { background: #1a1a1a; margin: 0; overflow: hidden; font-family: sans-serif; }
+    body { background: #000; margin: 0; overflow: hidden; }
     .snap-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
     
     .snap-item { 
         height: 100vh; 
         scroll-snap-align: start; 
-        position: relative; 
         display: flex; 
         align-items: center; 
         justify-content: center;
-    }
-
-    /* ভিডিওর আকার নিয়ন্ত্রণ */
-    video {
-        width: 85%;       /* স্ক্রিনের ৮৫% জায়গা নেবে */
-        height: 70%;      /* উচ্চতা ৭০% যাতে উপরে নিচে জায়গা থাকে */
-        object-fit: cover; 
-        border-radius: 20px; /* চারকোনা কোণগুলো রাউন্ড হবে */
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5); /* একটু শ্যাডো ইফেক্ট */
         background-color: #000;
     }
 
-    .overlay { position: absolute; bottom: 120px; left: 30px; color: white; z-index: 10; }
-    .actions { position: absolute; bottom: 150px; right: 25px; color: white; z-index: 10; }
+    /* ভিডিওর জন্য পোর্ট্রেট ফ্রেম */
+    video {
+        width: 100%;      /* স্ক্রিনের প্রস্থ অনুযায়ী */
+        height: 80vh;     /* উচ্চতা কিছুটা কম, যাতে উপরে-নিচে জায়গা থাকে */
+        object-fit: contain; /* ভিডিওকে না কেটে পুরোটা দেখাবে */
+        background-color: #000; 
+        border-radius: 15px;
+    }
+
+    /* বাটন ও ডেসক্রিপশন পজিশন */
+    .overlay { position: absolute; bottom: 100px; left: 20px; color: white; }
+    .actions { position: absolute; bottom: 120px; right: 20px; color: white; }
 </style>

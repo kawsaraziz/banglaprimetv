@@ -1,26 +1,20 @@
-<style>
-    body { background: #000; margin: 0; overflow: hidden; }
-    .snap-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
-    
-    .snap-item { 
-        height: 100vh; 
-        scroll-snap-align: start; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center;
-        background-color: #000;
-    }
-
-    /* ভিডিওর জন্য পোর্ট্রেট ফ্রেম */
-    video {
-        width: 100%;      /* স্ক্রিনের প্রস্থ অনুযায়ী */
-        height: 80vh;     /* উচ্চতা কিছুটা কম, যাতে উপরে-নিচে জায়গা থাকে */
-        object-fit: contain; /* ভিডিওকে না কেটে পুরোটা দেখাবে */
-        background-color: #000; 
-        border-radius: 15px;
-    }
-
-    /* বাটন ও ডেসক্রিপশন পজিশন */
-    .overlay { position: absolute; bottom: 100px; left: 20px; color: white; }
-    .actions { position: absolute; bottom: 120px; right: 20px; color: white; }
-</style>
+body { 
+    background: #000; margin: 0; overflow: hidden; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+}
+.snap-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+.snap-item { 
+    height: 100vh; scroll-snap-align: start; display: flex; 
+    flex-direction: column; align-items: center; justify-content: center; position: relative; 
+}
+video {
+    width: 92%; height: 65%; object-fit: contain;
+    background: #000; border-radius: 15px; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.info { position: absolute; bottom: 80px; left: 20px; color: white; width: 75%; }
+.actions { position: absolute; bottom: 100px; right: 15px; color: white; display: flex; flex-direction: column; gap: 22px; align-items: center; }
+.nav-bar { 
+    position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; 
+    padding: 15px 0; background: #000; color: white; font-size: 24px; border-top: 1px solid #222; z-index: 50; 
+}

@@ -11,7 +11,7 @@
 <body>
     <header>
         <div style="font-size: 26px; font-weight: bold;">Bangla Prime</div>
-        <input type="text" class="search-box" placeholder="🔍 চ্যানেল সার্চ করুন...">
+        <input type="text" id="search" class="search-box" placeholder="🔍 চ্যানেল সার্চ করুন...">
     </header>
 
     <div id="feed"></div>
@@ -24,15 +24,24 @@
     <script>
         fetch('channels.json').then(r => r.json()).then(data => {
             const feed = document.getElementById('feed');
-            data.forEach((ch, i) => {
-                feed.innerHTML += `
-                    <div class="card">
-                        <div class="header-info"><div class="profile-img"></div><b>${ch.name}</b></div>
-                        <video id="v-${i}" controls playsinline></video>
-                    </div>`;
-                const v = document.getElementById(`v-${i}`);
-                if (Hls.isSupported()) { const hls = new Hls(); hls.loadSource(ch.url); hls.attachMedia(v); }
-            });
+            function render(filter = "") {
+                feed.innerHTML = "";
+                data.filter(item => item.name.toLowerCase().includes(filter.toLowerCase())).forEach((ch, i) => {
+                    if(ch.type === 'video') {
+                        feed.innerHTML += `
+                            <div class="card">
+                                <div class="header-info"><div class="profile-img"></div><b>${ch.name}</b></div>
+                                <video id="v-${i}" controls playsinline></video>
+                                <div class="actions"><i class="fas fa-thumbs-up"></i> লাইক <i class="fas fa-comment"></i> কমেন্ট <i class="fas fa-share"></i> শেয়ার</div>
+                            </div>`;
+                        setTimeout(() => { const v = document.getElementById(`v-${i}`); const hls = new Hls(); hls.loadSource(ch.url); hls.attachMedia(v); }, 500);
+                    } else {
+                        feed.innerHTML += `<div class="card"><div class="header-info"><div class="profile-img"></div><b>${ch.name}</b></div><p style="padding:10px;">${ch.text}</p></div>`;
+                    }
+                });
+            }
+            render();
+            document.getElementById('search').oninput = (e) => render(e.target.value);
         });
     </script>
 </body>

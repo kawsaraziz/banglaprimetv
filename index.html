@@ -2,41 +2,33 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bangla Prime</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
-
-    <header>
-        <b>Bangla Prime</b>
-        <input type="text" class="search-box" placeholder="সার্চ করুন...">
-    </header>
-
+    <header>Bangla Prime</header>
     <div id="feed"></div>
-
     <nav class="nav-bar">
-        <a href="index.html" style="color:#1877f2"><i class="fas fa-home"></i></a>
-        <a href="video.html" style="color:#65676b"><i class="fas fa-video"></i></a>
+        <a href="index.html"><i class="fas fa-home"></i></a>
+        <a href="video.html"><i class="fas fa-video"></i></a>
     </nav>
-
     <script>
-        fetch('channels.json').then(r => r.json()).then(data => {
-            const feed = document.getElementById('feed');
-            data.forEach((ch, i) => {
-                feed.innerHTML += `
-                    <div class="card">
-                        <div class="header-info">
-                            <div class="profile-img"></div>
-                            <b>${ch.name}</b>
-                        </div>
-                        <video id="v-${i}" controls playsinline></video>
-                    </div>`;
-                const v = document.getElementById(`v-${i}`);
-                const hls = new Hls(); hls.loadSource(ch.url); hls.attachMedia(v);
-            });
+        const channels = [
+            { "name": "Bangla Prime News", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" },
+            { "name": "Bangla Prime TV", "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8" }
+        ];
+        const feed = document.getElementById('feed');
+        channels.forEach((ch, i) => {
+            feed.innerHTML += `
+                <div class="card">
+                    <div class="header-info"><div class="profile-img"></div><b>${ch.name}</b></div>
+                    <video id="v-${i}" controls playsinline></video>
+                </div>`;
+            const v = document.getElementById(`v-${i}`);
+            const hls = new Hls(); hls.loadSource(ch.url); hls.attachMedia(v);
         });
     </script>
 </body>

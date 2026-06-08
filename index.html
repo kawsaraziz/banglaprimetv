@@ -58,8 +58,24 @@
 </div>
 
 <script>
-    let channelData = [];
+    // Wake Lock API: মোবাইল স্ক্রিন অন রাখার জন্য
+    async function keepScreenOn() {
+        try {
+            const wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => {
+                console.log('Screen Wake Lock released');
+            });
+        } catch (err) {
+            console.error(`${err.name}, ${err.message}`);
+        }
+    }
 
+    // প্রথম ইউজার ইন্টারঅ্যাকশনে সক্রিয় হবে
+    document.addEventListener('click', () => {
+        keepScreenOn();
+    }, { once: true });
+
+    let channelData = [];
     fetch('channels.json')
     .then(r => r.json())
     .then(data => {

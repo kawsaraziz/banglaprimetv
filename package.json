@@ -1,0 +1,11 @@
+{
+  "name":"bangla-prime-tv",
+  "private":true,
+  "dependencies":{
+    "next":"latest",
+    "react":"latest",
+    "react-dom":"latest",
+    "hls.js":"latest",
+    "lucide-react":"latest"
+  }
+}

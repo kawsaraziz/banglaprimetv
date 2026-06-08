@@ -1,6 +1,7 @@
 <style>
-    body { background: #000; margin: 0; overflow: hidden; font-family: sans-serif; }
+    body { background: #1a1a1a; margin: 0; overflow: hidden; font-family: sans-serif; }
     .snap-container { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+    
     .snap-item { 
         height: 100vh; 
         scroll-snap-align: start; 
@@ -8,17 +9,18 @@
         display: flex; 
         align-items: center; 
         justify-content: center;
-        background-color: #000; /* ভিডিওর বাইরের অংশ কালো হবে */
-    }
-    
-    /* ভিডিও ফিট করার জন্য গুরুত্বপূর্ণ সিএসএস */
-    video {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; /* এটি ভিডিওকে জুম না করে পুরোটা দেখাবে */
     }
 
-    .overlay { position: absolute; bottom: 80px; left: 20px; color: white; z-index: 10; width: 80%; }
-    .actions { position: absolute; bottom: 100px; right: 15px; color: white; display: flex; flex-direction: column; gap: 20px; z-index: 10; }
-    .logo-gradient { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    /* ভিডিওর আকার নিয়ন্ত্রণ */
+    video {
+        width: 85%;       /* স্ক্রিনের ৮৫% জায়গা নেবে */
+        height: 70%;      /* উচ্চতা ৭০% যাতে উপরে নিচে জায়গা থাকে */
+        object-fit: cover; 
+        border-radius: 20px; /* চারকোনা কোণগুলো রাউন্ড হবে */
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5); /* একটু শ্যাডো ইফেক্ট */
+        background-color: #000;
+    }
+
+    .overlay { position: absolute; bottom: 120px; left: 30px; color: white; z-index: 10; }
+    .actions { position: absolute; bottom: 150px; right: 25px; color: white; z-index: 10; }
 </style>

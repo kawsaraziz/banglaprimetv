@@ -1,9 +1,0 @@
-{
-  "name": "Bangla Prime TV",
-  "short_name": "Bangla Prime",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#00a8e1",
-  "icons": [{ "src": "https://raw.githubusercontent.com/Rakib49/Rakibiptv/main/images%20(11).jpeg", "sizes": "192x192", "type": "image/jpeg" }]
-}

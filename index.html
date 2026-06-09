@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bangla Prime TV</title>
+    <title>Nahidflix TV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #000; color: #fff; font-family: sans-serif; }
+        body { background-color: #000; color: #fff; }
         .category-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 10px 16px; scrollbar-width: none; }
         .category-scroll::-webkit-scrollbar { display: none; }
-        .channel-card { min-width: 130px; height: 110px; border: 2px solid #ef4444; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; cursor: pointer; position: relative; }
-        .on-air-badge { position: absolute; top: 5px; left: 5px; background: #dc2626; color: white; font-size: 8px; padding: 2px 4px; border-radius: 4px; }
-        .fav-btn { position: absolute; bottom: 5px; right: 8px; color: #ef4444; }
+        .channel-card { min-width: 130px; height: 140px; border: 2px solid #ef4444; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; cursor: pointer; position: relative; }
+        .on-air-badge { position: absolute; top: 5px; left: 5px; background: #dc2626; color: white; font-size: 8px; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
+        .fav-btn { position: absolute; bottom: 8px; right: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <header class="flex justify-between items-center p-4 sticky top-0 bg-black z-50">
-        <button onclick="document.getElementById('sideMenu').classList.toggle('hidden')"><i class="fas fa-bars"></i></button>
-        <a href="#" class="text-red-600 font-bold text-xl tracking-tighter">Bangla Prime Tv</a>
-        <button onclick="document.getElementById('searchSection').scrollIntoView()"><i class="fas fa-search"></i></button>
+        <button onclick="document.getElementById('sideMenu').classList.remove('hidden')"><i class="fas fa-bars"></i></button>
+        <a href="#" class="text-red-600 font-bold text-xl">NAHIDFLIX</a>
+        <input type="text" id="headerSearch" onkeyup="searchGlobal(this.value)" placeholder="Search..." class="bg-gray-800 text-xs p-1 rounded w-20">
     </header>
 
     <div id="sideMenu" class="hidden fixed left-0 top-0 h-full w-48 bg-gray-900 p-5 z-50">
@@ -34,15 +34,10 @@
         </div>
     </div>
 
-    <div id="searchSection" class="px-4 mb-4">
-        <input type="text" id="searchInput" onkeyup="filterChannels()" placeholder="Search channels..." class="w-full bg-gray-800 p-3 rounded-lg text-sm border border-gray-700">
-    </div>
-
     <div id="mainContainer" class="pb-20"></div>
 
     <footer class="fixed bottom-0 w-full bg-black border-t border-gray-800 flex justify-around p-4">
-        <button onclick="location.reload()"><i class="fas fa-home"></i></button>
-        <button onclick="document.getElementById('searchSection').scrollIntoView()"><i class="fas fa-search"></i></button>
+        <button onclick="renderAll()"><i class="fas fa-home"></i></button>
         <button onclick="showFavs()"><i class="fas fa-heart text-red-500"></i></button>
     </footer>
 
@@ -50,25 +45,24 @@
         let channels = [];
         let favorites = JSON.parse(localStorage.getItem('favs')) || [];
 
-        // JSON ফাইল লোড করা
-        fetch('channels.json')
-            .then(res => res.json())
-            .then(data => { channels = data; render(); renderMenu(); });
+        fetch('channels.json').then(res => res.json()).then(data => { channels = data; renderAll(); renderMenu(); });
 
-        function render() {
+        function renderAll(data = channels) {
             const container = document.getElementById('mainContainer');
             container.innerHTML = '';
-            const cats = [...new Set(channels.map(c => c.category))];
+            const cats = [...new Set(data.map(c => c.category))];
             cats.forEach(cat => {
                 const section = document.createElement('div');
+                section.id = `cat-${cat}`;
                 section.innerHTML = `<h2 class="px-4 font-bold mb-2">${cat}</h2><div class="category-scroll" id="row-${cat}"></div>`;
                 container.appendChild(section);
                 const row = document.getElementById(`row-${cat}`);
-                channels.filter(c => c.category === cat).forEach(ch => {
+                data.filter(c => c.category === cat).forEach(ch => {
                     row.innerHTML += `
                         <div class="channel-card" onclick="play('${ch.url}')">
                             ${ch.isLive ? '<span class="on-air-badge">ON AIR</span>' : ''}
-                            <span class="text-xs">${ch.name}</span>
+                            <img src="${ch.logo}" class="w-10 h-10 mb-2 object-contain">
+                            <span class="text-xs text-center">${ch.name}</span>
                             <i class="fav-btn fas fa-heart ${favorites.includes(ch.id) ? 'text-red-500' : 'text-gray-500'}" onclick="toggleFav(${ch.id}, event)"></i>
                         </div>`;
                 });
@@ -80,29 +74,26 @@
             if(favorites.includes(id)) favorites = favorites.filter(f => f !== id);
             else favorites.push(id);
             localStorage.setItem('favs', JSON.stringify(favorites));
-            render();
+            renderAll();
         }
 
-        function filterChannels() {
-            const val = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('.channel-card').forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(val) ? 'flex' : 'none';
-            });
-        }
-
-        function play(url) {
-            document.getElementById('videoContainer').innerHTML = `<iframe src="${url}" class="w-full h-full" allowfullscreen></iframe>`;
+        function searchGlobal(val) {
+            const filtered = channels.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
+            renderAll(filtered);
         }
 
         function showFavs() {
-            const favChannels = channels.filter(c => favorites.includes(c.id));
-            alert("Favorites: " + favChannels.map(c => c.name).join(', '));
+            renderAll(channels.filter(c => favorites.includes(c.id)));
+        }
+
+        function play(url) {
+            document.getElementById('videoContainer').innerHTML = `<iframe src="${url}" class="w-full h-full"></iframe>`;
         }
 
         function renderMenu() {
             const menu = document.getElementById('menuItems');
             [...new Set(channels.map(c => c.category))].forEach(cat => {
-                menu.innerHTML += `<div class="cursor-pointer" onclick="alert('${cat} channels')">${cat}</div>`;
+                menu.innerHTML += `<div class="cursor-pointer" onclick="document.getElementById('cat-${cat}').scrollIntoView(); document.getElementById('sideMenu').classList.add('hidden')">${cat}</div>`;
             });
         }
     </script>

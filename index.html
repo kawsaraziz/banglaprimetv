@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nahidflix</title>
+    <title>Bongo Flex</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -20,7 +20,7 @@
     <div class="sticky-section">
         <header class="px-4 flex items-center justify-between mb-4">
             <i class="fas fa-bars text-xl" onclick="toggleMenu()"></i>
-            <a href="#"><img src="logo.png" alt="Nahidflix" class="h-10 w-auto"></a>
+            <a href="#"><img src="logo.png" alt="Bongo Flex" class="h-10 w-auto"></a>
             <i class="fas fa-search" onclick="document.getElementById('mainSearch').classList.toggle('hidden')"></i>
         </header>
 
@@ -28,7 +28,7 @@
             <video id="mainPlayer" class="w-full aspect-video bg-black rounded-xl border border-red-900/30" controls autoplay playsinline></video>
         </div>
 
-        <input type="text" id="mainSearch" onkeyup="searchChannels()" placeholder="Search channels..." class="hidden mx-4 w-[90%] mt-4 p-2 bg-gray-900 rounded-lg text-sm border border-red-900/30">
+        <input type="text" id="mainSearch" onkeyup="searchChannels()" placeholder="Search..." class="hidden mx-4 w-[90%] mt-4 p-2 bg-gray-900 rounded-lg text-sm border border-red-900/30">
     </div>
 
     <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4"></div>
@@ -43,8 +43,8 @@
         <i class="fas fa-times text-2xl p-4" onclick="toggleMenu()"></i>
         <div class="p-4">
             <h2 class="text-red-500 font-bold text-center mb-4 border-b border-gray-800 pb-2">ক্যাটাগরি</h2>
-            <div id="menuCategories" class="space-y-2 text-sm text-center mb-8"></div>
-            <h2 class="text-red-500 font-bold text-center mb-4 border-b border-gray-800 pb-2">সব চ্যানেল</h2>
+            <div id="menuCategories" class="flex flex-wrap justify-center gap-2 mb-8"></div>
+            <h2 class="text-red-500 font-bold text-center mb-4 border-b border-gray-800 pb-2">চ্যানেল সমূহ</h2>
             <div id="menuChannels" class="grid grid-cols-2 gap-2 text-xs text-center"></div>
         </div>
     </div>
@@ -58,21 +58,31 @@
             const res = await fetch('channels.json');
             allChannels = await res.json();
             render(allChannels);
-            
+            renderMenu();
+        }
+
+        function renderMenu() {
             const cats = ['All', ...new Set(allChannels.map(c => c.category))];
             document.getElementById('menuCategories').innerHTML = cats.map(c => 
-                `<p class="cursor-pointer py-1 hover:text-red-500" onclick="filter('${c}'); toggleMenu()">${c}</p>`
+                `<button class="bg-gray-800 px-3 py-1 rounded-full text-xs hover:bg-red-600" onclick="filterMenu('${c}')">${c}</button>`
             ).join('');
+            renderMenuChannels(allChannels);
+        }
 
-            document.getElementById('menuChannels').innerHTML = allChannels.map(ch => `
+        function filterMenu(cat) {
+            const filtered = cat === 'All' ? allChannels : allChannels.filter(x => x.category === cat);
+            renderMenuChannels(filtered);
+            render(filtered);
+        }
+
+        function renderMenuChannels(data) {
+            document.getElementById('menuChannels').innerHTML = data.map(ch => `
                 <div class="p-2 bg-gray-900 rounded-lg cursor-pointer" onclick="play('${ch.url}'); toggleMenu()">
                     <img src="${ch.logo}" class="w-8 h-8 mx-auto rounded-full mb-1">
                     <p class="truncate">${ch.name}</p>
                 </div>
             `).join('');
         }
-
-        function filter(c) { render(c === 'All' ? allChannels : allChannels.filter(x => x.category === c)); }
 
         function render(data) {
             document.getElementById('channelGrid').innerHTML = data.map(ch => `

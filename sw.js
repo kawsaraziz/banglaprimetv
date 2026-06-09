@@ -1,6 +1,11 @@
-self.addEventListener('install', (e) => {
- e.waitUntil(caches.open('tv-store').then((cache) => cache.addAll(['/'])));
-});
-self.addEventListener('fetch', (e) => {
- e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request)));
-});
+fetch('channels.json')
+    .then(r => r.json())
+    .then(data => { 
+        channels = data; 
+        renderAll(); 
+        renderMenu(); 
+    })
+    .catch(err => {
+        console.error("JSON লোড হয়নি, এররটি হলো:", err);
+        alert("চ্যানেল লিস্ট পাওয়া যাচ্ছে না! দয়া করে ফাইল পাথ চেক করুন।");
+    });

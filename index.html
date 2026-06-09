@@ -2,91 +2,48 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nahidflix Pro</title>
+    <title>Nahidflix TV</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
-        .header-player-wrapper { position: sticky; top: 0; z-index: 1000; background: #000; }
-        .cat-scroll { 
-            display: flex; overflow-x: auto; gap: 10px; padding: 15px; scrollbar-width: none; 
-            background: #000; position: sticky; top: 220px; z-index: 999; border-bottom: 1px solid #222;
-        }
-        .cat-scroll::-webkit-scrollbar { display: none; }
-        .channel-card { 
-            padding: 15px; text-align: center; cursor: pointer;
-            background: rgba(0, 0, 0, 0.8); border-radius: 15px;
-            box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.3);
-            transition: 0.3s;
-        }
-        .active-cat { background: #ff0000 !important; color: white; }
-        .menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; padding: 20px; }
+        body { background: #000; color: #fff; }
+        .channel-card { background: #111; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #333; }
     </style>
 </head>
-<body class="pb-24">
+<body class="p-4">
 
-    <div class="header-player-wrapper">
-        <header class="p-4 flex justify-between items-center border-b border-red-900/30">
-            <h1 class="text-red-600 font-bold text-2xl">NAHIDFLIX</h1>
-            <p style="font-family: cursive;" class="text-[10px] text-red-600">Powered By Kawsar Aziz</p>
-        </header>
-        <div class="aspect-video w-full">
-            <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
-        </div>
+    <div class="aspect-video w-full bg-black mb-4">
+        <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
 
-    <div class="cat-scroll" id="catBar"></div>
-    <div id="channelGrid" class="grid grid-cols-2 gap-6 p-6 mt-2"></div>
-
-    <footer class="fixed bottom-0 w-full bg-black/90 p-4 flex justify-around items-center z-[2000]">
-        <button onclick="location.reload()"><i class="fas fa-home text-xl"></i></button>
-        <input type="text" id="footerSearch" onkeyup="searchCh()" placeholder="Search..." class="w-2/3 bg-black py-2 px-4 rounded-full text-sm border border-red-900 outline-none">
-        <button onclick="toggleSideMenu()"><i class="fas fa-bars text-xl"></i></button>
-    </footer>
-
-    <div id="sideMenu" class="menu-overlay">
-        <button onclick="toggleSideMenu()" class="text-3xl absolute top-5 right-5"><i class="fas fa-times"></i></button>
-        <div id="menuCats" class="mt-20 space-y-6 text-2xl text-center"></div>
-    </div>
+    <div id="channelGrid" class="grid grid-cols-2 gap-4"></div>
 
     <script>
-        // এখানেই আপনার চ্যানেলের তথ্যগুলো যোগ করবেন
-        const channels = [
-            { id: 1, name: "Channel One", logo: "https://via.placeholder.com/150", url: "https://www.youtube.com/embed/dQw4w9WgXcQ", category: "News" },
-            { id: 2, name: "Sports TV", logo: "https://via.placeholder.com/150", url: "https://www.youtube.com/embed/example", category: "Sports" }
-        ];
+        // চ্যানেল লোড করার ফাংশন
+        async function loadData() {
+            try {
+                const response = await fetch('channels.json');
+                if (!response.ok) throw new Error("JSON ফাইলটি পাওয়া যাচ্ছে না!");
+                
+                const channels = await response.json();
+                renderChannels(channels);
+            } catch (error) {
+                console.error("এরর:", error);
+                document.getElementById('channelGrid').innerHTML = `<p class="col-span-2 text-red-500">চ্যানেল পাওয়া যায়নি! দয়া করে Live Server ব্যবহার করুন।</p>`;
+            }
+        }
 
-        function renderAll(data = channels, activeCat = 'All') {
-            document.getElementById('channelGrid').innerHTML = data.map(ch => `
-                <div class="channel-card" onclick="play('${ch.url}')">
-                    <img src="${ch.logo}" class="w-16 h-16 mx-auto rounded-full mb-3">
-                    <p class="text-xs font-bold truncate">${ch.name}</p>
+        function renderChannels(list) {
+            const grid = document.getElementById('channelGrid');
+            grid.innerHTML = list.map(ch => `
+                <div class="channel-card" onclick="document.getElementById('mainPlayer').src='${ch.url}?autoplay=1'">
+                    <img src="${ch.logo}" class="w-12 h-12 mx-auto mb-2">
+                    <p class="text-xs">${ch.name}</p>
                 </div>
             `).join('');
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active-cat', btn.innerText === activeCat));
         }
 
-        function play(url) { 
-            document.getElementById('mainPlayer').src = url + (url.includes('?') ? "&" : "?") + "autoplay=1"; 
-        }
-
-        function toggleSideMenu() { 
-            const menu = document.getElementById('sideMenu');
-            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-        }
-        
-        function renderMenu() {
-            const cats = ['All', ...new Set(channels.map(c => c.category))];
-            document.getElementById('menuCats').innerHTML = cats.map(c => `<div onclick="filter('${c}'); toggleSideMenu()">${c}</div>`).join('');
-            document.getElementById('catBar').innerHTML = cats.map(c => `<button onclick="filter('${c}')" class="cat-btn px-5 py-2 bg-gray-900 rounded-full text-xs">${c}</button>`).join('');
-        }
-
-        function filter(cat) { renderAll((cat === 'All') ? channels : channels.filter(c => c.category === cat), cat); }
-        function searchCh() { const val = document.getElementById('footerSearch').value.toLowerCase(); renderAll(channels.filter(c => c.name.toLowerCase().includes(val))); }
-
-        renderAll();
-        renderMenu();
+        // লোড শুরু করুন
+        loadData();
     </script>
 </body>
 </html>

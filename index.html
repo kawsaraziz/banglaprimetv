@@ -1,119 +1,93 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <link rel="icon" type="image/x-icon" href="https://i.ibb.co/wN3NPjL8/Adobe-Express-file-1.png">
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Bangla Prime TV">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bangla Prime TV</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <title>Nahidflix Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: #000; color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-        header { background: #111; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-img { width: 60px; }
-        .search-box input { background: #222; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 15px; width: 150px; }
-
-        .main-wrapper { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 300px; background: #111; overflow-y: auto; padding: 10px; border-right: 1px solid #333; }
-        
-        .player-wrapper { flex: 1; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
-        .player-container { width: 100%; aspect-ratio: 16 / 9; background: #000; position: relative; overflow: hidden; }
-        video { width: 100%; height: 100%; }
-
-        .watermark { position: absolute; top: 10%; left: 10%; color: rgba(255, 255, 255, 0.3); font-size: 20px; animation: move 10s linear infinite alternate; pointer-events: none; z-index: 10; }
-        .ticker-box { margin-top: 10px; background: #1a1a1a; padding: 8px; border-radius: 20px; overflow: hidden; white-space: nowrap; border: 1px solid #444; }
-        .ticker-text { display: inline-block; padding-left: 100%; animation: ticker 20s linear infinite; }
-
-        .mobile-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; overflow-y: auto; flex: 1; padding: 5px; }
-
-        @keyframes ticker { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-        @keyframes move { from { top: 10%; left: 10%; } to { top: 70%; left: 60%; } }
-
-        @media (max-width: 768px) {
-            .main-wrapper { flex-direction: column; }
-            .sidebar { display: none; }
-            .mobile-grid { display: grid; }
-        }
+        body { background-color: #000; color: white; }
+        .scroll-x { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; }
+        .scroll-x::-webkit-scrollbar { display: none; }
+        .channel-card { min-width: 120px; border: 2px solid #ef4444; border-radius: 10px; padding: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="https://i.ibb.co/wN3NPjL8/Adobe-Express-file-1.png" alt="Logo" class="logo-img">
-    <div class="search-box"><input type="text" id="search" placeholder="Search..." onkeyup="filterChannels()"></div>
-</header>
+    <header class="p-4 flex justify-between items-center sticky top-0 bg-black z-50">
+        <button onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        <a href="#" onclick="location.reload()" class="text-red-600 font-bold text-xl">NAHIDFLIX</a>
+        <input type="text" id="searchInput" placeholder="Search..." class="bg-gray-800 p-1 rounded text-sm w-24" onkeyup="searchChannels()">
+    </header>
 
-<div class="main-wrapper">
-    <div class="sidebar" id="sidebar"></div>
-    <div class="player-wrapper">
-        <div class="player-container">
-            <video id="video-player" controls autoplay playsinline></video>
-            <div class="watermark">Bangla Prime TV By Kawsar</div>
-        </div>
-        <div class="ticker-box">
-            <div class="ticker-text">গ্লোবাল কানেক্টিভিটি, লোকাল এন্টারটেইনমেন্ট - Bangla Prime TV, সব সময় আপনাদের পাশে। আপনার পছন্দের টিভি চ্যানেলগুলো এখন হাতের মুঠোয়। যেকোনো সমস্যা বা আপডেটের জন্য আমাদের সাথেই থাকুন।</div>
-        </div>
-        <div class="mobile-grid" id="mobile-grid"></div>
+    <div id="sideMenu" class="hidden fixed left-0 top-0 h-full w-48 bg-gray-900 p-5 z-50">
+        <button onclick="toggleMenu()" class="mb-5"><i class="fas fa-times"></i></button>
+        <div id="categoryMenu" class="space-y-3"></div>
     </div>
-</div>
 
-<script>
-    // Wake Lock API
-    async function keepScreenOn() {
-        try {
-            const wakeLock = await navigator.wakeLock.request('screen');
-            wakeLock.addEventListener('release', () => console.log('Screen Wake Lock released'));
-        } catch (err) { console.error(`${err.name}, ${err.message}`); }
-    }
+    <div class="p-4">
+        <div class="aspect-video bg-gray-900 rounded-lg flex items-center justify-center border-2 border-red-600">
+            <p id="playerStatus">Select a channel</p>
+        </div>
+    </div>
 
-    document.addEventListener('click', () => { keepScreenOn(); }, { once: true });
+    <div id="mainContainer" class="p-4 space-y-6"></div>
 
-    // Service Worker Registration
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-    }
+    <footer class="fixed bottom-0 w-full bg-black border-t border-gray-800 flex justify-around p-4">
+        <button onclick="location.reload()"><i class="fas fa-home"></i></button>
+        <button onclick="document.getElementById('searchInput').focus()"><i class="fas fa-search"></i></button>
+        <button onclick="showFavorites()"><i class="fas fa-heart text-red-500"></i></button>
+    </footer>
 
-    let channelData = [];
-    fetch('channels.json')
-    .then(r => r.json())
-    .then(data => {
-        channelData = data;
-        renderChannels(data);
-    });
-
-    function renderChannels(data) {
-        const sidebar = document.getElementById('sidebar');
-        const grid = document.getElementById('mobile-grid');
-        sidebar.innerHTML = ''; grid.innerHTML = '';
+    <script>
+        let favorites = JSON.parse(localStorage.getItem('favs')) || [];
         
-        data.forEach(c => {
-            const itemHTML = `<div onclick="play('${c.url}')" style="cursor:pointer; padding:10px; border-bottom:1px solid #333; display:flex; align-items:center;">
-                <img src="${c.logo}" width="30" style="margin-right:8px;"> ${c.name}</div>`;
-            sidebar.innerHTML += itemHTML;
-            grid.innerHTML += `<div onclick="play('${c.url}')" style="text-align:center; background:#1a1a1a; padding:8px; border-radius:5px;">
-                <img src="${c.logo}" width="35"><div style="font-size:11px; margin-top:5px;">${c.name}</div></div>`;
-        });
-    }
+        // আপনার JSON ডেটা এখানে আসবে
+        const channels = [
+            { id: 1, name: "Ananda TV", category: "Bangla", isLive: true },
+            { id: 2, name: "T-Sports", category: "Sports", isLive: false },
+            { id: 3, name: "Somoy News", category: "News", isLive: true }
+        ];
 
-    function filterChannels() {
-        const query = document.getElementById('search').value.toLowerCase();
-        renderChannels(channelData.filter(c => c.name.toLowerCase().includes(query)));
-    }
+        function render() {
+            const container = document.getElementById('mainContainer');
+            container.innerHTML = '';
+            const categories = [...new Set(channels.map(c => c.category))];
 
-    function play(url) {
-        const video = document.getElementById('video-player');
-        if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(url);
-            hls.attachMedia(video);
-            hls.play();
+            categories.forEach(cat => {
+                container.innerHTML += `<div><h2 class="font-bold mb-2">${cat}</h2><div class="scroll-x" id="cat-${cat}"></div></div>`;
+                const row = document.getElementById(`cat-${cat}`);
+                channels.filter(c => c.category === cat).forEach(ch => {
+                    row.innerHTML += `
+                        <div class="channel-card" onclick="play('${ch.name}')">
+                            <i class="fas fa-heart ${favorites.includes(ch.id) ? 'text-red-500' : 'text-gray-500'}" onclick="toggleFav(${ch.id}, event)"></i>
+                            <div class="mt-2 text-xs">${ch.name}</div>
+                            ${ch.isLive ? '<span class="text-[8px] bg-red-600 px-1 mt-1 block">ON AIR</span>' : ''}
+                        </div>`;
+                });
+            });
         }
-    }
-</script>
+
+        function toggleFav(id, e) {
+            e.stopPropagation();
+            if(favorites.includes(id)) favorites = favorites.filter(f => f !== id);
+            else favorites.push(id);
+            localStorage.setItem('favs', JSON.stringify(favorites));
+            render();
+        }
+
+        function searchChannels() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('.channel-card').forEach(card => {
+                card.style.display = card.innerText.toLowerCase().includes(val) ? 'block' : 'none';
+            });
+        }
+
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('hidden'); }
+        function play(name) { document.getElementById('playerStatus').innerText = "Playing: " + name; }
+        
+        render();
+    </script>
 </body>
 </html>

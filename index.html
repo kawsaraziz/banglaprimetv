@@ -3,45 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nahidflix Pro</title>
+    <title>Bangla Prime Tv</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .red-glow { border: 1px solid #dc2626; }
-        .player-wrapper { position: sticky; top: 0; z-index: 100; background: #000; }
-        .cat-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 15px; scrollbar-width: none; }
+        
+        /* স্টিকি প্লেয়ার ও ক্যাটাগরি */
+        .header-sticky { position: sticky; top: 0; z-index: 100; background: #000; }
+        .cat-scroll { display: flex; overflow-x: auto; gap: 12px; padding: 10px 15px; scrollbar-width: none; background: #000; position: sticky; top: 56vw; z-index: 99; }
         .cat-scroll::-webkit-scrollbar { display: none; }
+        
         .channel-card { min-width: 130px; padding: 15px; text-align: center; border: 1px solid #333; border-radius: 12px; cursor: pointer; transition: 0.3s; }
         .channel-card:hover { border-color: #dc2626; }
+        
+        /* স্টাইলিশ ফন্ট */
+        .signature { font-family: 'Brush Script MT', cursive; color: #ff0000; font-size: 10px; letter-spacing: 1px; }
     </style>
 </head>
 <body class="pb-24">
 
-    <header class="p-4 flex justify-between items-center glass">
-        <h1 class="text-red-600 font-bold text-2xl">NAHIDFLIX</h1>
+    <header class="header-sticky p-4 glass border-b border-gray-800">
+        <div class="flex justify-between items-center">
+            <h1 class="text-red-600 font-bold text-2xl">Bangla Prime Tv</h1>
+            <p class="signature">Powered By Kawsar Aziz</p>
+        </div>
     </header>
 
-    <div class="player-wrapper aspect-video w-full border-b-2 border-red-600">
+    <div class="aspect-video w-full border-b-2 border-red-600">
         <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
 
     <div class="cat-scroll" id="catBar">
-        <button onclick="renderAll()" class="px-5 py-2 bg-red-600 rounded-full text-xs">All</button>
+        <button onclick="renderAll()" class="px-5 py-2 bg-red-600 rounded-full text-xs shrink-0">All</button>
     </div>
 
     <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4"></div>
 
-    <footer class="fixed bottom-0 w-full glass p-4 flex justify-around items-center">
+    <footer class="fixed bottom-0 w-full glass p-4 flex justify-around items-center z-50">
         <button onclick="location.reload()"><i class="fas fa-home text-xl"></i></button>
-        
         <div class="relative w-2/3">
             <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
             <input type="text" id="footerSearch" onkeyup="searchCh()" placeholder="Search channels..." 
                    class="w-full bg-black/50 py-2 pl-10 pr-4 rounded-full text-sm border border-gray-800 outline-none">
         </div>
-        
         <button onclick="toggleSideMenu()"><i class="fas fa-bars text-xl"></i></button>
     </footer>
 
@@ -52,7 +59,6 @@
 
     <script>
         let channels = [];
-
         fetch('channels.json').then(r => r.json()).then(data => { channels = data; renderAll(); renderMenu(); });
 
         function renderAll(data = channels) {
@@ -70,11 +76,10 @@
         function renderMenu() {
             const cats = [...new Set(channels.map(c => c.category))];
             document.getElementById('menuCats').innerHTML = cats.map(c => `<div onclick="filter('${c}'); toggleSideMenu()">${c}</div>`).join('');
-            document.getElementById('catBar').innerHTML += cats.map(c => `<button onclick="filter('${c}')" class="px-4 py-2 bg-[#1a1a1a] rounded-full text-xs whitespace-nowrap">${c}</button>`).join('');
+            document.getElementById('catBar').innerHTML += cats.map(c => `<button onclick="filter('${c}')" class="px-4 py-2 bg-[#1a1a1a] rounded-full text-xs whitespace-nowrap shrink-0">${c}</button>`).join('');
         }
 
         function filter(cat) { renderAll(channels.filter(c => c.category === cat)); }
-        
         function searchCh() {
             const val = document.getElementById('footerSearch').value.toLowerCase();
             renderAll(channels.filter(c => c.name.toLowerCase().includes(val)));

@@ -2,61 +2,60 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nahidflix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #050505; color: white; }
-        .sticky-header { position: sticky; top: 0; z-index: 50; background: #050505; padding: 16px 0; }
-        .channel-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 0, 0, 0.1); box-shadow: 0 0 15px 2px rgba(255, 0, 0, 0.2); border-radius: 15px; }
-        .menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; padding: 20px; }
+        body { background: #050505; color: white; font-family: sans-serif; }
+        /* প্লেয়ার লক ও ট্রান্সপারেন্ট ব্যাকগ্রাউন্ড */
+        .sticky-section { position: sticky; top: 0; z-index: 100; background: #050505; padding-bottom: 10px; }
+        .channel-card { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 0, 0, 0.2); 
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+            border-radius: 16px; 
+            transition: 0.3s;
+        }
+        .menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 200; padding: 20px; }
     </style>
 </head>
 <body class="pb-24">
 
-    <div class="sticky-header px-4 border-b border-red-900/20">
-        <header class="flex items-center justify-between">
+    <div class="sticky-section px-4 pt-4">
+        <header class="flex items-center justify-between mb-4">
             <i class="fas fa-bars text-xl" onclick="toggleMenu()"></i>
             <h1 class="text-red-600 font-bold text-2xl">NAHIDFLIX</h1>
             <i class="fas fa-search" onclick="focusSearch()"></i>
         </header>
-    </div>
-
-    <div class="px-4 py-4">
-        <div class="aspect-video w-full bg-black rounded-xl overflow-hidden border border-red-900/30">
+        <div class="aspect-video w-full bg-black rounded-xl overflow-hidden border border-red-900/50">
             <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
+        <input type="text" id="mainSearch" onkeyup="searchChannels()" placeholder="Search channels..." class="hidden w-full mt-3 p-2 bg-gray-900 rounded-lg text-sm border border-red-900/30">
+        <div id="catBar" class="flex gap-2 mt-4 overflow-x-auto pb-1"></div>
     </div>
-
-    <div id="catBar" class="flex gap-2 px-4 pb-4 overflow-x-auto"></div>
-
-    <input type="text" id="mainSearch" onkeyup="searchChannels()" placeholder="Search..." 
-           class="hidden mx-4 w-[90%] p-3 mb-4 bg-gray-900 text-sm outline-none border border-red-900/30 rounded-lg">
 
     <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4"></div>
 
-    <nav class="fixed bottom-0 w-full bg-black border-t border-red-900/20 p-4 flex justify-around text-gray-400 z-50">
-        <div class="flex flex-col items-center"><i class="fas fa-home text-lg text-red-600"></i><span class="text-[10px]">Home</span></div>
-        <div class="flex flex-col items-center" onclick="focusSearch()"><i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span></div>
-        <div class="flex flex-col items-center" onclick="toggleMenu()"><i class="fas fa-bars text-lg"></i><span class="text-[10px]">Menu</span></div>
-    </nav>
-
     <div id="sideMenu" class="menu-overlay">
-        <i class="fas fa-times text-2xl" onclick="toggleMenu()"></i>
-        <div class="mt-10 space-y-6 text-2xl text-center">
-            <p onclick="filter('All'); toggleMenu()">সব চ্যানেল</p>
-        </div>
+        <i class="fas fa-times text-2xl p-4" onclick="toggleMenu()"></i>
+        <div id="menuContent" class="mt-10 space-y-4 text-xl text-center"></div>
     </div>
+
+    <nav class="fixed bottom-0 w-full bg-black border-t border-red-900/20 p-4 flex justify-around text-gray-400 z-50">
+        <div class="flex flex-col items-center text-red-600"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Home</span></div>
+        <div class="flex flex-col items-center" onclick="focusSearch()"><i class="fas fa-search text-xl"></i><span class="text-[10px]">Search</span></div>
+        <div class="flex flex-col items-center" onclick="toggleMenu()"><i class="fas fa-bars text-xl"></i><span class="text-[10px]">Menu</span></div>
+    </nav>
 
     <script>
         let allChannels = [];
         async function init() {
-            try {
-                const res = await fetch('channels.json');
-                allChannels = await res.json();
-                render(allChannels);
-                renderCats();
-            } catch(e) { console.error("JSON লোড হয়নি"); }
+            const res = await fetch('channels.json');
+            allChannels = await res.json();
+            render(allChannels);
+            renderCats();
         }
 
         function render(data) {
@@ -71,7 +70,10 @@
         function renderCats() {
             const cats = ['All', ...new Set(allChannels.map(c => c.category))];
             document.getElementById('catBar').innerHTML = cats.map(c => 
-                `<button onclick="filter('${c}')" class="bg-gray-800 px-5 py-1 rounded-full text-xs whitespace-nowrap">${c}</button>`
+                `<button onclick="filter('${c}')" class="bg-gray-900 px-4 py-1 rounded-full text-xs whitespace-nowrap">${c}</button>`
+            ).join('');
+            document.getElementById('menuContent').innerHTML = cats.map(c => 
+                `<p onclick="filter('${c}'); toggleMenu()">${c}</p>`
             ).join('');
         }
 

@@ -8,28 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background-color: #000; color: #fff; }
-        .grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 16px; }
-        .channel-card { border: 2px solid #ff0000; padding: 10px; border-radius: 8px; position: relative; }
-        .on-air { background: #ff0000; font-size: 8px; padding: 2px 4px; position: absolute; top: 5px; left: 5px; }
+        .grid-box { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
+        .card { border: 2px solid #ff0000; padding: 10px; border-radius: 8px; position: relative; text-align: center; }
+        .fav-active { color: #ff0000; }
         .player-sticky { position: sticky; top: 0; z-index: 50; }
-        .side-menu { transform: translateX(-100%); transition: 0.3s; }
-        .side-menu.active { transform: translateX(0); }
     </style>
 </head>
 <body class="pb-24">
 
     <header class="p-4 flex justify-between items-center bg-black">
         <h1 class="text-red-600 font-bold text-xl">NAHIDFLIX</h1>
-        <input type="text" id="searchBox" onkeyup="searchCh()" placeholder="Search..." class="bg-[#1a1a1a] p-1 rounded text-sm w-24">
+        <input type="text" id="searchBox" onkeyup="searchCh()" placeholder="Search 1200+ channels..." class="bg-[#1a1a1a] p-2 rounded-lg text-sm w-48 border border-gray-700">
     </header>
 
     <div class="player-sticky w-full aspect-video bg-black border-b-2 border-red-600">
-        <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay"></iframe>
+        <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
 
-    <div id="catBar" class="flex gap-4 p-4 overflow-x-auto"></div>
+    <div class="px-4 mt-4">
+        <h2 class="font-bold mb-2">Continue Watching</h2>
+        <div id="continueRow" class="flex gap-4 overflow-x-auto pb-2"></div>
+    </div>
 
-    <div id="channelGrid" class="grid-container"></div>
+    <div id="channelGrid" class="grid-box"></div>
 
     <footer class="fixed bottom-0 w-full bg-black border-t border-red-900 flex justify-around p-4 z-50">
         <button onclick="location.reload()"><i class="fas fa-home"></i></button>
@@ -37,49 +38,58 @@
         <button onclick="showFavs()"><i class="fas fa-heart text-red-500"></i></button>
     </footer>
 
-    <div id="sideMenu" class="side-menu fixed inset-0 bg-black z-[100] p-6">
-        <button onclick="document.getElementById('sideMenu').classList.remove('active')" class="mb-10 text-2xl"><i class="fas fa-times"></i></button>
-        <div id="menuCategories" class="space-y-6"></div>
+    <div id="sideMenu" class="fixed inset-0 bg-black z-[100] p-6 hidden">
+        <button onclick="this.parentElement.classList.remove('active')" class="text-2xl mb-6"><i class="fas fa-times"></i></button>
+        <div id="menuCats" class="space-y-4"></div>
     </div>
 
     <script>
         let channels = [];
         let favs = JSON.parse(localStorage.getItem('favs')) || [];
+        let history = JSON.parse(localStorage.getItem('history')) || [];
 
-        fetch('channels.json').then(r => r.json()).then(data => { channels = data; renderAll(); });
+        fetch('channels.json').then(r => r.json()).then(data => { channels = data; renderAll(); renderMenu(); });
 
         function renderAll(data = channels) {
-            const grid = document.getElementById('channelGrid');
-            grid.innerHTML = data.map(ch => `
-                <div class="channel-card" onclick="play('${ch.url}', ${ch.id})">
-                    ${ch.isLive ? '<span class="on-air">LIVE</span>' : ''}
-                    <img src="${ch.logo}" class="w-12 h-12 mx-auto mb-2">
-                    <p class="text-xs text-center">${ch.name}</p>
-                    <i class="fas fa-heart ${favs.includes(ch.id) ? 'text-red-500' : 'text-gray-500'} absolute bottom-2 right-2" 
-                       onclick="toggleFav(${ch.id}, event)"></i>
+            document.getElementById('channelGrid').innerHTML = data.map(ch => `
+                <div class="card" onclick="play('${ch.url}', ${ch.id})">
+                    ${ch.isLive ? '<span class="absolute top-1 left-1 text-[8px] bg-red-600 px-1">LIVE</span>' : ''}
+                    <img src="${ch.logo}" class="w-12 h-12 mx-auto">
+                    <p class="text-[10px] mt-2">${ch.name}</p>
+                    <i class="fas fa-heart absolute bottom-1 right-1 ${favs.includes(ch.id) ? 'fav-active' : 'text-gray-500'}" onclick="toggleFav(${ch.id}, event)"></i>
                 </div>
             `).join('');
-            
-            // ক্যাটাগরি মেনু তৈরি
-            const cats = [...new Set(channels.map(c => c.category))];
-            document.getElementById('menuCategories').innerHTML = cats.map(c => 
-                `<div onclick="filter('${c}'); document.getElementById('sideMenu').classList.remove('active')" class="text-xl border-b border-gray-800 pb-2">${c}</div>`
-            ).join('');
+        }
+
+        function play(url, id) {
+            document.getElementById('mainPlayer').src = url + "?autoplay=1";
+            if(!history.includes(id)) { history.unshift(id); localStorage.setItem('history', JSON.stringify(history.slice(0,5))); }
+            renderHistory();
         }
 
         function toggleFav(id, e) {
             e.stopPropagation();
-            if(favs.includes(id)) favs = favs.filter(f => f !== id);
-            else favs.push(id);
+            favs.includes(id) ? favs = favs.filter(f => f !== id) : favs.push(id);
             localStorage.setItem('favs', JSON.stringify(favs));
-            renderAll(); // রি-রেন্ডার করে হার্ট আইকন আপডেট করা
+            renderAll(); // রিফ্রেশ কার্ড
         }
 
-        function play(url, id) { document.getElementById('mainPlayer').src = url + "?autoplay=1"; }
+        function renderHistory() {
+            document.getElementById('continueRow').innerHTML = history.map(id => {
+                const ch = channels.find(c => c.id === id);
+                return ch ? `<div class="min-w-[60px]"><img src="${ch.logo}" class="w-10 h-10 mx-auto"></div>` : '';
+            }).join('');
+        }
+
+        function renderMenu() {
+            const cats = [...new Set(channels.map(c => c.category))];
+            document.getElementById('menuCats').innerHTML = cats.map(c => `<div onclick="filter('${c}'); document.getElementById('sideMenu').classList.remove('active')">${c}</div>`).join('');
+        }
+
         function filter(cat) { renderAll(channels.filter(c => c.category === cat)); }
         function searchCh() {
-            const v = document.getElementById('searchBox').value.toLowerCase();
-            renderAll(channels.filter(c => c.name.toLowerCase().includes(v)));
+            const val = document.getElementById('searchBox').value.toLowerCase();
+            renderAll(channels.filter(c => c.name.toLowerCase().includes(val)));
         }
         function showFavs() { renderAll(channels.filter(c => favs.includes(c.id))); }
     </script>

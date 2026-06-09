@@ -7,46 +7,69 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; }
         
-        /* স্টিকি প্লেয়ার ও ক্যাটাগরি */
-        .sticky-top { position: sticky; top: 0; z-index: 100; background: #000; }
-        .cat-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 15px; scrollbar-width: none; background: #000; position: sticky; top: 56.25vw; z-index: 99; }
+        /* প্লেয়ার এবং ক্যাটাগরি ফিক্সড বা লক করার জন্য */
+        .sticky-header-player { 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            background: #000; 
+        }
+        
+        .cat-scroll { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 10px; 
+            padding: 10px 15px; 
+            scrollbar-width: none; 
+            background: #000; 
+            position: sticky; 
+            top: 210px; /* প্লেয়ারের উচ্চতার উপর ভিত্তি করে */
+            z-index: 999; 
+        }
+        
         .cat-scroll::-webkit-scrollbar { display: none; }
         
-        /* গ্লোসি রেড ভাইব */
         .channel-card { min-width: 130px; padding: 15px; text-align: center; background: rgba(255, 0, 0, 0.1); border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
-        .channel-card:hover { background: rgba(255, 0, 0, 0.2); }
+        .active-cat { background: #ff0000 !important; }
         
-        .active-cat { background: #ff0000 !important; color: white; }
-        .signature { font-family: cursive; color: #ff0000; font-size: 10px; }
+        /* মেনু স্টাইল */
+        .side-menu { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 20px; }
     </style>
 </head>
 <body class="pb-24">
 
-    <header class="sticky-top p-4 glass border-b border-red-900/30">
-        <div class="flex justify-between items-center">
+    <!-- হেডার এবং প্লেয়ার লকিং এরিয়া -->
+    <div class="sticky-header-player">
+        <header class="p-4 flex justify-between items-center border-b border-red-900/30">
             <h1 class="text-red-600 font-bold text-2xl">NAHIDFLIX</h1>
-            <p class="signature">Powered By Kawsar Aziz</p>
+            <p class="text-[10px] text-red-600 italic">Powered By Kawsar Aziz</p>
+        </header>
+        
+        <div class="aspect-video w-full">
+            <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
-    </header>
-
-    <div class="aspect-video w-full">
-        <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
 
+    <!-- ক্যাটাগরি ট্যাব -->
     <div class="cat-scroll" id="catBar"></div>
 
-    <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4 mt-2"></div>
+    <!-- চ্যানেল গ্রিড -->
+    <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4"></div>
 
-    <footer class="fixed bottom-0 w-full glass p-4 flex justify-around items-center z-50">
+    <!-- ফুটার -->
+    <footer class="fixed bottom-0 w-full bg-black/80 backdrop-blur-md p-4 flex justify-around items-center z-[1000]">
         <button onclick="location.reload()"><i class="fas fa-home text-xl"></i></button>
-        <div class="relative w-2/3">
-            <input type="text" id="footerSearch" onkeyup="searchCh()" placeholder="Search..." class="w-full bg-black/50 py-2 px-4 rounded-full text-sm border border-red-900/50 outline-none">
-        </div>
+        <input type="text" id="footerSearch" onkeyup="searchCh()" placeholder="Search..." class="w-2/3 bg-black/50 py-2 px-4 rounded-full text-sm border border-red-900/50 outline-none">
         <button onclick="toggleSideMenu()"><i class="fas fa-bars text-xl"></i></button>
     </footer>
+
+    <!-- সাইড মেনু -->
+    <div id="sideMenu" class="side-menu">
+        <button onclick="toggleSideMenu()" class="text-3xl p-4"><i class="fas fa-times"></i></button>
+        <div id="menuCats" class="mt-10 p-4 space-y-6 text-xl"></div>
+    </div>
 
     <script>
         let channels = [];
@@ -60,7 +83,6 @@
                 </div>
             `).join('');
             
-            // ক্যাটাগরি বাটন হাইলাইট
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.classList.toggle('active-cat', btn.innerText === activeCat);
             });
@@ -68,8 +90,14 @@
 
         function play(url) { document.getElementById('mainPlayer').src = url + "?autoplay=1"; }
         
+        function toggleSideMenu() { 
+            const menu = document.getElementById('sideMenu');
+            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        }
+
         function renderMenu() {
             const cats = ['All', ...new Set(channels.map(c => c.category))];
+            document.getElementById('menuCats').innerHTML = cats.map(c => `<div onclick="filter('${c}'); toggleSideMenu()">${c}</div>`).join('');
             document.getElementById('catBar').innerHTML = cats.map(c => 
                 `<button onclick="filter('${c}')" class="cat-btn px-5 py-2 bg-gray-900 rounded-full text-xs whitespace-nowrap shrink-0">${c}</button>`
             ).join('');

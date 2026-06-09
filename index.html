@@ -5,52 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nahidflix</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background: #050505; color: white; font-family: sans-serif; }
-        /* প্লেয়ার লক ও ট্রান্সপারেন্ট ব্যাকগ্রাউন্ড */
-        .sticky-section { position: sticky; top: 0; z-index: 100; background: #050505; padding-bottom: 10px; }
-        .channel-card { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 0, 0, 0.2); 
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
-            border-radius: 16px; 
-            transition: 0.3s;
-        }
-        .menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 200; padding: 20px; }
+        /* প্লেয়ার এবং ক্যাটাগরি একসাথে লক করার জন্য */
+        .sticky-section { position: sticky; top: 0; z-index: 50; background: #050505; padding-top: 10px; }
+        .channel-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 0, 0, 0.2); box-shadow: 0 0 15px 2px rgba(255, 0, 0, 0.2); border-radius: 16px; transition: 0.3s; }
+        .active-pill { background: #ff0000 !important; color: white; }
+        .menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; padding: 20px; }
     </style>
 </head>
 <body class="pb-24">
 
-    <div class="sticky-section px-4 pt-4">
-        <header class="flex items-center justify-between mb-4">
+    <div class="sticky-section">
+        <header class="px-4 flex items-center justify-between mb-4">
             <i class="fas fa-bars text-xl" onclick="toggleMenu()"></i>
             <h1 class="text-red-600 font-bold text-2xl">NAHIDFLIX</h1>
-            <i class="fas fa-search" onclick="focusSearch()"></i>
+            <i class="fas fa-search" onclick="document.getElementById('mainSearch').classList.toggle('hidden')"></i>
         </header>
-        <div class="aspect-video w-full bg-black rounded-xl overflow-hidden border border-red-900/50">
-            <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
+
+        <div class="px-4">
+            <video id="mainPlayer" class="w-full aspect-video bg-black rounded-xl border border-red-900/30" controls autoplay playsinline></video>
         </div>
-        <input type="text" id="mainSearch" onkeyup="searchChannels()" placeholder="Search channels..." class="hidden w-full mt-3 p-2 bg-gray-900 rounded-lg text-sm border border-red-900/30">
-        <div id="catBar" class="flex gap-2 mt-4 overflow-x-auto pb-1"></div>
+
+        <input type="text" id="mainSearch" onkeyup="searchChannels()" placeholder="Search..." class="hidden mx-4 w-[90%] mt-4 p-2 bg-gray-900 rounded-lg text-sm border border-red-900/30">
+        
+        <div id="catBar" class="flex gap-2 mt-4 px-4 overflow-x-auto pb-2"></div>
     </div>
 
     <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4"></div>
+
+    <nav class="fixed bottom-0 w-full bg-black border-t border-red-900/20 p-4 flex justify-around text-gray-400 z-50">
+        <div class="flex flex-col items-center text-red-600"><i class="fas fa-home text-lg"></i><span class="text-[10px]">Home</span></div>
+        <div class="flex flex-col items-center" onclick="document.getElementById('mainSearch').classList.toggle('hidden')"><i class="fas fa-search text-lg"></i><span class="text-[10px]">Search</span></div>
+        <div class="flex flex-col items-center" onclick="toggleMenu()"><i class="fas fa-bars text-lg"></i><span class="text-[10px]">Menu</span></div>
+    </nav>
 
     <div id="sideMenu" class="menu-overlay">
         <i class="fas fa-times text-2xl p-4" onclick="toggleMenu()"></i>
         <div id="menuContent" class="mt-10 space-y-4 text-xl text-center"></div>
     </div>
 
-    <nav class="fixed bottom-0 w-full bg-black border-t border-red-900/20 p-4 flex justify-around text-gray-400 z-50">
-        <div class="flex flex-col items-center text-red-600"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Home</span></div>
-        <div class="flex flex-col items-center" onclick="focusSearch()"><i class="fas fa-search text-xl"></i><span class="text-[10px]">Search</span></div>
-        <div class="flex flex-col items-center" onclick="toggleMenu()"><i class="fas fa-bars text-xl"></i><span class="text-[10px]">Menu</span></div>
-    </nav>
-
     <script>
         let allChannels = [];
+        const video = document.getElementById('mainPlayer');
+        let hls = new Hls();
+
         async function init() {
             const res = await fetch('channels.json');
             allChannels = await res.json();
@@ -58,29 +59,40 @@
             renderCats();
         }
 
+        function renderCats() {
+            const cats = ['All', ...new Set(allChannels.map(c => c.category))];
+            document.getElementById('catBar').innerHTML = cats.map(c => 
+                `<button onclick="filter('${c}', this)" class="cat-btn bg-gray-800 px-5 py-1 rounded-full text-xs whitespace-nowrap">${c}</button>`
+            ).join('');
+            document.getElementById('menuContent').innerHTML = cats.map(c => 
+                `<p class="cursor-pointer" onclick="filter('${c}'); toggleMenu()">${c}</p>`
+            ).join('');
+        }
+
+        function filter(c, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active-pill'));
+            if(btn) btn.classList.add('active-pill');
+            render(c === 'All' ? allChannels : allChannels.filter(x => x.category === c));
+        }
+
         function render(data) {
             document.getElementById('channelGrid').innerHTML = data.map(ch => `
-                <div class="channel-card p-4 text-center" onclick="play('${ch.url}')">
+                <div class="channel-card p-4 text-center cursor-pointer" onclick="play('${ch.url}')">
                     <img src="${ch.logo}" class="w-16 h-16 mx-auto rounded-full mb-2">
                     <p class="text-xs font-bold truncate">${ch.name}</p>
                 </div>
             `).join('');
         }
 
-        function renderCats() {
-            const cats = ['All', ...new Set(allChannels.map(c => c.category))];
-            document.getElementById('catBar').innerHTML = cats.map(c => 
-                `<button onclick="filter('${c}')" class="bg-gray-900 px-4 py-1 rounded-full text-xs whitespace-nowrap">${c}</button>`
-            ).join('');
-            document.getElementById('menuContent').innerHTML = cats.map(c => 
-                `<p onclick="filter('${c}'); toggleMenu()">${c}</p>`
-            ).join('');
+        function play(url) {
+            if (Hls.isSupported()) {
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                video.play();
+            } else { video.src = url; video.play(); }
         }
 
-        function play(url) { document.getElementById('mainPlayer').src = url + '?autoplay=1'; }
-        function focusSearch() { const s = document.getElementById('mainSearch'); s.classList.toggle('hidden'); s.focus(); }
         function toggleMenu() { const m = document.getElementById('sideMenu'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
-        function filter(c) { render(c === 'All' ? allChannels : allChannels.filter(x => x.category === c)); }
         function searchChannels() { const v = document.getElementById('mainSearch').value.toLowerCase(); render(allChannels.filter(c => c.name.toLowerCase().includes(v))); }
 
         init();

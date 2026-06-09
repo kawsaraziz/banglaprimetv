@@ -3,91 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bangla Prime Tv</title>
+    <title>Nahidflix TV Design</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #000; color: #fff; }
-        .bg-bright-red { background-color: #ff0000; }
-        .text-bright-red { color: #ff0000; }
-        .border-bright-red { border: 2px solid #ff0000; }
-        
-        /* চারকোণা প্লেয়ার এবং কার্ড */
-        .square-style { border-radius: 0px !important; }
-        
-        .category-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px; scrollbar-width: none; }
-        .category-scroll::-webkit-scrollbar { display: none; }
-        
-        .channel-card { min-width: 120px; height: 130px; border: 2px solid #ff0000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; cursor: pointer; position: relative; }
-        .on-air-badge { position: absolute; top: 0; left: 0; background: #ff0000; color: white; font-size: 9px; padding: 2px 5px; font-weight: bold; }
+        body { background-color: #0a0a0a; color: white; font-family: sans-serif; }
+        .scroll-container { display: flex; overflow-x: auto; gap: 16px; padding: 16px; scrollbar-width: none; }
+        .scroll-container::-webkit-scrollbar { display: none; }
+        .card { min-width: 140px; background: #161616; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid #333; }
+        .player-border { border: 2px solid #333; border-radius: 16px; overflow: hidden; }
+        .text-red-primary { color: #e50914; }
     </style>
 </head>
-<body>
+<body class="pb-20">
 
-    <header class="flex items-center p-4 sticky top-0 bg-black z-50 border-b border-red-600">
-        <button onclick="document.getElementById('sideMenu').classList.remove('hidden')" class="mr-4"><i class="fas fa-bars text-xl"></i></button>
-        <a href="#" class="text-bright-red font-bold text-2xl">Bangla Prime TV</a>
+    <header class="p-4 flex items-center justify-between sticky top-0 bg-[#0a0a0a]/90 z-50">
+        <div class="flex items-center gap-4">
+            <i class="fas fa-bars text-xl"></i>
+            <h1 class="text-red-primary font-bold text-2xl">NAHIDFLIX</h1>
+        </div>
+        <div class="bg-[#161616] px-4 py-2 rounded-full flex items-center gap-2 border border-gray-800">
+            <i class="fas fa-search text-gray-400"></i>
+            <input type="text" placeholder="Search channels..." class="bg-transparent outline-none text-sm w-32">
+        </div>
     </header>
 
-    <div id="sideMenu" class="hidden fixed left-0 top-0 h-full w-64 bg-black border-r border-red-600 p-5 z-50">
-        <button onclick="this.parentElement.classList.add('hidden')" class="mb-5"><i class="fas fa-times text-2xl"></i></button>
-        <div id="menuItems" class="space-y-4"></div>
-    </div>
-
-    <div class="p-4">
-        <div id="videoContainer" class="aspect-video bg-gray-900 border-4 border-red-600 square-style flex items-center justify-center">
-            <p id="playerMsg">চ্যানেল সিলেক্ট করুন</p>
+    <section class="px-4">
+        <div class="aspect-video bg-black player-border flex items-center justify-center">
+            <p class="text-gray-500">Video Player Component</p>
         </div>
-    </div>
+    </section>
 
-    <div id="mainContainer" class="pb-20"></div>
+    <section class="mt-6">
+        <h2 class="px-4 font-bold flex items-center gap-2">
+            <i class="far fa-clock text-red-primary"></i> Continue Watching
+        </h2>
+        <div class="scroll-container">
+            <div class="card"><div class="h-16 bg-gray-800 rounded-lg mb-2"></div><p class="text-xs">Discovery</p></div>
+            <div class="card"><div class="h-16 bg-gray-800 rounded-lg mb-2"></div><p class="text-xs">Ananda TV</p></div>
+        </div>
+    </section>
+
+    <section id="channel-lists"></section>
+
+    <footer class="fixed bottom-0 w-full bg-black border-t border-gray-800 flex justify-around p-4 z-50">
+        <div class="text-red-primary text-center"><i class="fas fa-home"></i><p class="text-[10px]">Home</p></div>
+        <div class="text-gray-500 text-center"><i class="fas fa-search"></i><p class="text-[10px]">Search</p></div>
+        <div class="text-gray-500 text-center"><i class="fas fa-heart"></i><p class="text-[10px]">Favs</p></div>
+    </footer>
 
     <script>
-        let channels = [];
-        let favorites = JSON.parse(localStorage.getItem('favs')) || [];
+        // এখানে আপনার JSON ডেটা দিয়ে এই ফাংশনটি লুপ করাবেন
+        const categories = ["Bangla Channels", "Sports", "News"];
+        const listDiv = document.getElementById('channel-lists');
 
-        fetch('channels.json').then(res => res.json()).then(data => { channels = data; renderAll(channels); renderMenu(); });
-
-        function renderAll(data) {
-            const container = document.getElementById('mainContainer');
-            container.innerHTML = '';
-            const cats = [...new Set(data.map(c => c.category))];
-            
-            cats.forEach(cat => {
-                const section = document.createElement('div');
-                section.id = `cat-${cat}`;
-                section.innerHTML = `<h2 class="px-4 font-bold text-bright-red mb-2">${cat}</h2><div class="category-scroll" id="row-${cat}"></div>`;
-                container.appendChild(section);
-                
-                const row = document.getElementById(`row-${cat}`);
-                data.filter(c => c.category === cat).forEach(ch => {
-                    row.innerHTML += `
-                        <div class="channel-card square-style" onclick="playChannel('${ch.url}', '${ch.name}')">
-                            ${ch.isLive ? '<span class="on-air-badge">ON AIR</span>' : ''}
-                            <img src="${ch.logo}" class="w-10 h-10 mb-1 object-contain">
-                            <span class="text-[10px] text-center">${ch.name}</span>
-                        </div>`;
-                });
-            });
-        }
-
-        function playChannel(url, name) {
-            document.getElementById('videoContainer').innerHTML = `<iframe src="${url}" class="w-full h-full" allow="autoplay"></iframe>`;
-            // এখানে অটোপ্লে লজিক সেট করা হয়েছে
-        }
-
-        function renderMenu() {
-            const menu = document.getElementById('menuItems');
-            [...new Set(channels.map(c => c.category))].forEach(cat => {
-                menu.innerHTML += `<div class="cursor-pointer hover:text-red-500" onclick="filterByCategory('${cat}')">${cat}</div>`;
-            });
-        }
-
-        function filterByCategory(cat) {
-            const filtered = channels.filter(c => c.category === cat);
-            renderAll(filtered);
-            document.getElementById('sideMenu').classList.add('hidden');
-        }
+        categories.forEach(cat => {
+            listDiv.innerHTML += `
+                <div class="mt-6">
+                    <h2 class="px-4 font-bold">${cat}</h2>
+                    <div class="scroll-container">
+                        <div class="card border-red-900"><div class="h-16 bg-red-900/20 rounded-lg mb-2"></div><p class="text-xs">Channel 1</p></div>
+                        <div class="card"><div class="h-16 bg-gray-800 rounded-lg mb-2"></div><p class="text-xs">Channel 2</p></div>
+                    </div>
+                </div>
+            `;
+        });
     </script>
 </body>
 </html>

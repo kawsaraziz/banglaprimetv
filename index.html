@@ -3,98 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nahidflix TV</title>
+    <title>Bangla Prime Tv</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body { background-color: #000; color: #fff; }
-        .category-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 10px 16px; scrollbar-width: none; }
+        .bg-bright-red { background-color: #ff0000; }
+        .text-bright-red { color: #ff0000; }
+        .border-bright-red { border: 2px solid #ff0000; }
+        
+        /* চারকোণা প্লেয়ার এবং কার্ড */
+        .square-style { border-radius: 0px !important; }
+        
+        .category-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px; scrollbar-width: none; }
         .category-scroll::-webkit-scrollbar { display: none; }
-        .channel-card { min-width: 130px; height: 140px; border: 2px solid #ef4444; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; cursor: pointer; position: relative; }
-        .on-air-badge { position: absolute; top: 5px; left: 5px; background: #dc2626; color: white; font-size: 8px; padding: 2px 4px; border-radius: 4px; font-weight: bold; }
-        .fav-btn { position: absolute; bottom: 8px; right: 8px; cursor: pointer; }
+        
+        .channel-card { min-width: 120px; height: 130px; border: 2px solid #ff0000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; cursor: pointer; position: relative; }
+        .on-air-badge { position: absolute; top: 0; left: 0; background: #ff0000; color: white; font-size: 9px; padding: 2px 5px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <header class="flex justify-between items-center p-4 sticky top-0 bg-black z-50">
-        <button onclick="document.getElementById('sideMenu').classList.remove('hidden')"><i class="fas fa-bars"></i></button>
-        <a href="#" class="text-red-600 font-bold text-xl">NAHIDFLIX</a>
-        <input type="text" id="headerSearch" onkeyup="searchGlobal(this.value)" placeholder="Search..." class="bg-gray-800 text-xs p-1 rounded w-20">
+    <header class="flex items-center p-4 sticky top-0 bg-black z-50 border-b border-red-600">
+        <button onclick="document.getElementById('sideMenu').classList.remove('hidden')" class="mr-4"><i class="fas fa-bars text-xl"></i></button>
+        <a href="#" class="text-bright-red font-bold text-2xl">Bangla Prime TV</a>
     </header>
 
-    <div id="sideMenu" class="hidden fixed left-0 top-0 h-full w-48 bg-gray-900 p-5 z-50">
-        <button onclick="this.parentElement.classList.add('hidden')" class="mb-5"><i class="fas fa-times"></i></button>
+    <div id="sideMenu" class="hidden fixed left-0 top-0 h-full w-64 bg-black border-r border-red-600 p-5 z-50">
+        <button onclick="this.parentElement.classList.add('hidden')" class="mb-5"><i class="fas fa-times text-2xl"></i></button>
         <div id="menuItems" class="space-y-4"></div>
     </div>
 
     <div class="p-4">
-        <div id="videoContainer" class="aspect-video bg-gray-900 rounded-xl border-2 border-red-600 flex items-center justify-center">
-            <p>Select a channel</p>
+        <div id="videoContainer" class="aspect-video bg-gray-900 border-4 border-red-600 square-style flex items-center justify-center">
+            <p id="playerMsg">চ্যানেল সিলেক্ট করুন</p>
         </div>
     </div>
 
     <div id="mainContainer" class="pb-20"></div>
 
-    <footer class="fixed bottom-0 w-full bg-black border-t border-gray-800 flex justify-around p-4">
-        <button onclick="renderAll()"><i class="fas fa-home"></i></button>
-        <button onclick="showFavs()"><i class="fas fa-heart text-red-500"></i></button>
-    </footer>
-
     <script>
         let channels = [];
         let favorites = JSON.parse(localStorage.getItem('favs')) || [];
 
-        fetch('channels.json').then(res => res.json()).then(data => { channels = data; renderAll(); renderMenu(); });
+        fetch('channels.json').then(res => res.json()).then(data => { channels = data; renderAll(channels); renderMenu(); });
 
-        function renderAll(data = channels) {
+        function renderAll(data) {
             const container = document.getElementById('mainContainer');
             container.innerHTML = '';
             const cats = [...new Set(data.map(c => c.category))];
+            
             cats.forEach(cat => {
                 const section = document.createElement('div');
                 section.id = `cat-${cat}`;
-                section.innerHTML = `<h2 class="px-4 font-bold mb-2">${cat}</h2><div class="category-scroll" id="row-${cat}"></div>`;
+                section.innerHTML = `<h2 class="px-4 font-bold text-bright-red mb-2">${cat}</h2><div class="category-scroll" id="row-${cat}"></div>`;
                 container.appendChild(section);
+                
                 const row = document.getElementById(`row-${cat}`);
                 data.filter(c => c.category === cat).forEach(ch => {
                     row.innerHTML += `
-                        <div class="channel-card" onclick="play('${ch.url}')">
+                        <div class="channel-card square-style" onclick="playChannel('${ch.url}', '${ch.name}')">
                             ${ch.isLive ? '<span class="on-air-badge">ON AIR</span>' : ''}
-                            <img src="${ch.logo}" class="w-10 h-10 mb-2 object-contain">
-                            <span class="text-xs text-center">${ch.name}</span>
-                            <i class="fav-btn fas fa-heart ${favorites.includes(ch.id) ? 'text-red-500' : 'text-gray-500'}" onclick="toggleFav(${ch.id}, event)"></i>
+                            <img src="${ch.logo}" class="w-10 h-10 mb-1 object-contain">
+                            <span class="text-[10px] text-center">${ch.name}</span>
                         </div>`;
                 });
             });
         }
 
-        function toggleFav(id, e) {
-            e.stopPropagation();
-            if(favorites.includes(id)) favorites = favorites.filter(f => f !== id);
-            else favorites.push(id);
-            localStorage.setItem('favs', JSON.stringify(favorites));
-            renderAll();
-        }
-
-        function searchGlobal(val) {
-            const filtered = channels.filter(c => c.name.toLowerCase().includes(val.toLowerCase()));
-            renderAll(filtered);
-        }
-
-        function showFavs() {
-            renderAll(channels.filter(c => favorites.includes(c.id)));
-        }
-
-        function play(url) {
-            document.getElementById('videoContainer').innerHTML = `<iframe src="${url}" class="w-full h-full"></iframe>`;
+        function playChannel(url, name) {
+            document.getElementById('videoContainer').innerHTML = `<iframe src="${url}" class="w-full h-full" allow="autoplay"></iframe>`;
+            // এখানে অটোপ্লে লজিক সেট করা হয়েছে
         }
 
         function renderMenu() {
             const menu = document.getElementById('menuItems');
             [...new Set(channels.map(c => c.category))].forEach(cat => {
-                menu.innerHTML += `<div class="cursor-pointer" onclick="document.getElementById('cat-${cat}').scrollIntoView(); document.getElementById('sideMenu').classList.add('hidden')">${cat}</div>`;
+                menu.innerHTML += `<div class="cursor-pointer hover:text-red-500" onclick="filterByCategory('${cat}')">${cat}</div>`;
             });
+        }
+
+        function filterByCategory(cat) {
+            const filtered = channels.filter(c => c.category === cat);
+            renderAll(filtered);
+            document.getElementById('sideMenu').classList.add('hidden');
         }
     </script>
 </body>

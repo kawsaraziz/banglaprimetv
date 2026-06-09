@@ -3,71 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nahidflix TV Design</title>
+    <title>Nahidflix TV</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background-color: #0a0a0a; color: white; font-family: sans-serif; }
-        .scroll-container { display: flex; overflow-x: auto; gap: 16px; padding: 16px; scrollbar-width: none; }
-        .scroll-container::-webkit-scrollbar { display: none; }
-        .card { min-width: 140px; background: #161616; border-radius: 12px; padding: 12px; text-align: center; border: 1px solid #333; }
-        .player-border { border: 2px solid #333; border-radius: 16px; overflow: hidden; }
-        .text-red-primary { color: #e50914; }
+        body { background-color: #050505; color: white; font-family: sans-serif; }
+        .scroll-hide::-webkit-scrollbar { display: none; }
+        .player-fixed { position: sticky; top: 0; z-index: 100; }
+        .cat-icon { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #1a1a1a; margin-bottom: 5px; }
+        .active-red { border: 2px solid #ff0000; }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
 
-    <header class="p-4 flex items-center justify-between sticky top-0 bg-[#0a0a0a]/90 z-50">
-        <div class="flex items-center gap-4">
-            <i class="fas fa-bars text-xl"></i>
-            <h1 class="text-red-primary font-bold text-2xl">NAHIDFLIX</h1>
-        </div>
-        <div class="bg-[#161616] px-4 py-2 rounded-full flex items-center gap-2 border border-gray-800">
-            <i class="fas fa-search text-gray-400"></i>
-            <input type="text" placeholder="Search channels..." class="bg-transparent outline-none text-sm w-32">
+    <header class="p-4 flex items-center justify-between">
+        <h1 class="text-[#ff0000] font-bold text-2xl">NAHIDFLIX</h1>
+        <div class="relative">
+            <i class="fas fa-search absolute left-3 top-3 text-gray-500"></i>
+            <input type="text" id="searchBox" onkeyup="searchCh()" placeholder="Search..." class="bg-[#1a1a1a] pl-10 pr-4 py-2 rounded-full text-sm w-40 border border-gray-800 outline-none">
         </div>
     </header>
 
-    <section class="px-4">
-        <div class="aspect-video bg-black player-border flex items-center justify-center">
-            <p class="text-gray-500">Video Player Component</p>
-        </div>
-    </section>
+    <div class="player-fixed w-full aspect-video bg-black border-b-2 border-red-900">
+        <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay"></iframe>
+    </div>
 
-    <section class="mt-6">
-        <h2 class="px-4 font-bold flex items-center gap-2">
-            <i class="far fa-clock text-red-primary"></i> Continue Watching
-        </h2>
-        <div class="scroll-container">
-            <div class="card"><div class="h-16 bg-gray-800 rounded-lg mb-2"></div><p class="text-xs">Discovery</p></div>
-            <div class="card"><div class="h-16 bg-gray-800 rounded-lg mb-2"></div><p class="text-xs">Ananda TV</p></div>
-        </div>
-    </section>
+    <div class="flex gap-4 p-4 overflow-x-auto scroll-hide bg-[#050505]">
+        <button onclick="renderAll()" class="flex flex-col items-center"><div class="cat-icon bg-red-600"><i class="fas fa-th"></i></div><span class="text-[10px]">All</span></button>
+        <button onclick="filterCat('Bangla')" class="flex flex-col items-center"><div class="cat-icon"><i class="fas fa-language"></i></div><span class="text-[10px]">Bangla</span></button>
+        <button onclick="filterCat('Sports')" class="flex flex-col items-center"><div class="cat-icon"><i class="fas fa-futbol"></i></div><span class="text-[10px]">Sports</span></button>
+        <button onclick="filterCat('News')" class="flex flex-col items-center"><div class="cat-icon"><i class="fas fa-newspaper"></i></div><span class="text-[10px]">News</span></button>
+    </div>
 
-    <section id="channel-lists"></section>
+    <div id="mainContent">
+        <h2 class="px-4 font-bold text-lg">Continue Watching</h2>
+        <div id="continueRow" class="flex gap-4 p-4 overflow-x-auto scroll-hide"></div>
+        <div id="channelGrid"></div>
+    </div>
 
-    <footer class="fixed bottom-0 w-full bg-black border-t border-gray-800 flex justify-around p-4 z-50">
-        <div class="text-red-primary text-center"><i class="fas fa-home"></i><p class="text-[10px]">Home</p></div>
-        <div class="text-gray-500 text-center"><i class="fas fa-search"></i><p class="text-[10px]">Search</p></div>
-        <div class="text-gray-500 text-center"><i class="fas fa-heart"></i><p class="text-[10px]">Favs</p></div>
+    <footer class="fixed bottom-0 w-full bg-black border-t border-gray-800 flex justify-around p-3 z-50">
+        <button onclick="location.reload()"><i class="fas fa-home"></i><p class="text-[10px]">Home</p></button>
+        <button onclick="toggleMenu()"><i class="fas fa-bars"></i><p class="text-[10px]">Menu</p></button>
+        <button onclick="showFavs()"><i class="fas fa-heart text-red-500"></i><p class="text-[10px]">Favs</p></button>
     </footer>
 
     <script>
-        // এখানে আপনার JSON ডেটা দিয়ে এই ফাংশনটি লুপ করাবেন
-        const categories = ["Bangla Channels", "Sports", "News"];
-        const listDiv = document.getElementById('channel-lists');
+        let channels = []; // এখানে আপনার JSON ডেটা লোড হবে
+        
+        // প্লেয়ার অটোপ্লে এবং লক ফাংশন
+        function play(url) {
+            document.getElementById('mainPlayer').src = url + "?autoplay=1";
+        }
 
-        categories.forEach(cat => {
-            listDiv.innerHTML += `
-                <div class="mt-6">
-                    <h2 class="px-4 font-bold">${cat}</h2>
-                    <div class="scroll-container">
-                        <div class="card border-red-900"><div class="h-16 bg-red-900/20 rounded-lg mb-2"></div><p class="text-xs">Channel 1</p></div>
-                        <div class="card"><div class="h-16 bg-gray-800 rounded-lg mb-2"></div><p class="text-xs">Channel 2</p></div>
-                    </div>
-                </div>
-            `;
-        });
+        function filterCat(cat) {
+            // ক্যাটাগরি অনুযায়ী ফিল্টার লজিক
+        }
+
+        function toggleMenu() {
+            // থ্রী লাইন মেনু লজিক
+            alert("ক্যাটাগরি মেনু ওপেন হবে");
+        }
+
+        // ফেভারিট লজিক
+        function toggleFav(id, event) {
+            event.stopPropagation();
+            // ফেভারিট টগল কোড
+        }
     </script>
 </body>
 </html>

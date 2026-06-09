@@ -2,48 +2,67 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>Nahidflix TV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nahidflix</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; }
-        .channel-card { background: #111; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #333; }
+        body { background: #0a0a0a; color: white; font-family: sans-serif; }
+        .bg-dark { background: #111; }
+        .nav-bar { background: #000; border-top: 1px solid #222; }
+        .card { background: #1a1a1a; border-radius: 12px; }
+        .active-pill { background: #ff0000; color: white; }
     </style>
 </head>
-<body class="p-4">
+<body class="pb-20">
 
-    <div class="aspect-video w-full bg-black mb-4">
-        <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <header class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <i class="fas fa-bars text-xl"></i>
+            <h1 class="text-red-600 font-bold text-2xl tracking-tighter">NAHIDFLIX</h1>
+        </div>
+        <div class="bg-gray-900 px-4 py-2 rounded-full flex items-center gap-2">
+            <i class="fas fa-search text-gray-400"></i>
+            <input type="text" placeholder="Search 1200+ channels..." class="bg-transparent outline-none text-sm w-32">
+        </div>
+    </header>
+
+    <div class="flex gap-2 p-4 overflow-x-auto scrollbar-hide">
+        <button class="active-pill px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+            <i class="fas fa-tv"></i> All
+        </button>
+        <button class="bg-gray-900 px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+            <i class="fas fa-language"></i> Bangla
+        </button>
+        <button class="bg-gray-900 px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
+            <i class="fas fa-trophy"></i> Sports
+        </button>
     </div>
 
-    <div id="channelGrid" class="grid grid-cols-2 gap-4"></div>
+    <div class="px-4">
+        <div class="aspect-video bg-black rounded-xl overflow-hidden border border-gray-800">
+            <iframe id="mainPlayer" src="" class="w-full h-full"></iframe>
+        </div>
+    </div>
 
-    <script>
-        // চ্যানেল লোড করার ফাংশন
-        async function loadData() {
-            try {
-                const response = await fetch('channels.json');
-                if (!response.ok) throw new Error("JSON ফাইলটি পাওয়া যাচ্ছে না!");
-                
-                const channels = await response.json();
-                renderChannels(channels);
-            } catch (error) {
-                console.error("এরর:", error);
-                document.getElementById('channelGrid').innerHTML = `<p class="col-span-2 text-red-500">চ্যানেল পাওয়া যায়নি! দয়া করে Live Server ব্যবহার করুন।</p>`;
-            }
-        }
+    <div class="p-4">
+        <h2 class="text-red-500 font-bold mb-3 flex items-center gap-2">
+            <i class="far fa-clock"></i> Continue Watching (5)
+        </h2>
+        <div class="flex gap-4 overflow-x-auto">
+            <div class="card p-4 min-w-[150px]">
+                <div class="h-16 w-16 bg-gray-800 rounded-lg mb-2"></div>
+                <p class="text-sm font-bold">DISCOVERY HD</p>
+            </div>
+        </div>
+    </div>
 
-        function renderChannels(list) {
-            const grid = document.getElementById('channelGrid');
-            grid.innerHTML = list.map(ch => `
-                <div class="channel-card" onclick="document.getElementById('mainPlayer').src='${ch.url}?autoplay=1'">
-                    <img src="${ch.logo}" class="w-12 h-12 mx-auto mb-2">
-                    <p class="text-xs">${ch.name}</p>
-                </div>
-            `).join('');
-        }
+    <nav class="nav-bar fixed bottom-0 w-full p-4 flex justify-around text-gray-500">
+        <button class="text-white flex flex-col items-center text-xs"><i class="fas fa-home text-lg"></i> Home</button>
+        <button class="flex flex-col items-center text-xs"><i class="fas fa-search text-lg"></i> Search</button>
+        <button class="flex flex-col items-center text-xs"><i class="fas fa-heart text-lg"></i> Favs</button>
+        <button class="flex flex-col items-center text-xs"><i class="fas fa-bars text-lg"></i> Menu</button>
+    </nav>
 
-        // লোড শুরু করুন
-        loadData();
-    </script>
 </body>
 </html>

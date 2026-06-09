@@ -7,62 +7,79 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0a0a0a; color: white; font-family: sans-serif; }
-        .bg-dark { background: #111; }
-        .nav-bar { background: #000; border-top: 1px solid #222; }
-        .card { background: #1a1a1a; border-radius: 12px; }
-        .active-pill { background: #ff0000; color: white; }
+        body { background: #0a0a0a; color: white; }
+        .active-pill { background: #ff0000 !important; }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
 
-    <header class="p-4 flex items-center justify-between">
+    <!-- হেডার -->
+    <header class="p-4 flex items-center justify-between sticky top-0 bg-black z-50">
         <div class="flex items-center gap-4">
-            <i class="fas fa-bars text-xl"></i>
+            <i class="fas fa-bars text-xl" onclick="alert('Menu Opened')"></i>
             <h1 class="text-red-600 font-bold text-2xl tracking-tighter">NAHIDFLIX</h1>
         </div>
         <div class="bg-gray-900 px-4 py-2 rounded-full flex items-center gap-2">
             <i class="fas fa-search text-gray-400"></i>
-            <input type="text" placeholder="Search 1200+ channels..." class="bg-transparent outline-none text-sm w-32">
+            <input type="text" id="searchInput" onkeyup="searchChannels()" placeholder="Search channels..." class="bg-transparent outline-none text-sm w-32">
         </div>
     </header>
 
-    <div class="flex gap-2 p-4 overflow-x-auto scrollbar-hide">
-        <button class="active-pill px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
-            <i class="fas fa-tv"></i> All
-        </button>
-        <button class="bg-gray-900 px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
-            <i class="fas fa-language"></i> Bangla
-        </button>
-        <button class="bg-gray-900 px-6 py-2 rounded-full text-sm font-bold flex items-center gap-2">
-            <i class="fas fa-trophy"></i> Sports
-        </button>
+    <!-- ক্যাটাগরি বার -->
+    <div id="catBar" class="flex gap-2 px-4 py-2 overflow-x-auto">
+        <button onclick="filterChannels('All')" class="bg-gray-800 px-6 py-2 rounded-full text-sm font-bold active-pill">All</button>
     </div>
 
-    <div class="px-4">
-        <div class="aspect-video bg-black rounded-xl overflow-hidden border border-gray-800">
-            <iframe id="mainPlayer" src="" class="w-full h-full"></iframe>
-        </div>
-    </div>
+    <!-- চ্যানেল গ্রিড -->
+    <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4"></div>
 
-    <div class="p-4">
-        <h2 class="text-red-500 font-bold mb-3 flex items-center gap-2">
-            <i class="far fa-clock"></i> Continue Watching (5)
-        </h2>
-        <div class="flex gap-4 overflow-x-auto">
-            <div class="card p-4 min-w-[150px]">
-                <div class="h-16 w-16 bg-gray-800 rounded-lg mb-2"></div>
-                <p class="text-sm font-bold">DISCOVERY HD</p>
-            </div>
-        </div>
-    </div>
+    <script>
+        let allChannels = [];
 
-    <nav class="nav-bar fixed bottom-0 w-full p-4 flex justify-around text-gray-500">
-        <button class="text-white flex flex-col items-center text-xs"><i class="fas fa-home text-lg"></i> Home</button>
-        <button class="flex flex-col items-center text-xs"><i class="fas fa-search text-lg"></i> Search</button>
-        <button class="flex flex-col items-center text-xs"><i class="fas fa-heart text-lg"></i> Favs</button>
-        <button class="flex flex-col items-center text-xs"><i class="fas fa-bars text-lg"></i> Menu</button>
-    </nav>
+        // JSON লোড করা
+        async function fetchChannels() {
+            try {
+                const response = await fetch('channels.json');
+                allChannels = await response.json();
+                renderChannels(allChannels);
+                renderCategories();
+            } catch (error) {
+                console.error("JSON ফাইল লোড হয়নি:", error);
+            }
+        }
 
+        // চ্যানেল রেন্ডার করা
+        function renderChannels(data) {
+            const grid = document.getElementById('channelGrid');
+            grid.innerHTML = data.map(ch => `
+                <div class="bg-gray-900 p-4 rounded-xl text-center" onclick="console.log('Playing ${ch.name}')">
+                    <img src="${ch.logo}" class="w-16 h-16 mx-auto rounded-full mb-2">
+                    <p class="text-xs font-bold truncate">${ch.name}</p>
+                </div>
+            `).join('');
+        }
+
+        // ক্যাটাগরি তৈরি
+        function renderCategories() {
+            const cats = ['All', ...new Set(allChannels.map(c => c.category))];
+            const catBar = document.getElementById('catBar');
+            catBar.innerHTML = cats.map(c => `
+                <button onclick="filterChannels('${c}')" class="bg-gray-800 px-6 py-2 rounded-full text-sm font-bold">${c}</button>
+            `).join('');
+        }
+
+        // ফিল্টার এবং সার্চ
+        function filterChannels(cat) {
+            const filtered = (cat === 'All') ? allChannels : allChannels.filter(c => c.category === cat);
+            renderChannels(filtered);
+        }
+
+        function searchChannels() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            renderChannels(allChannels.filter(c => c.name.toLowerCase().includes(val)));
+        }
+
+        fetchChannels();
+    </script>
 </body>
 </html>

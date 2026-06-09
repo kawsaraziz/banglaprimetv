@@ -7,94 +7,47 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; }
+        body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 0; }
         
         /* লকিং সিস্টেম */
         .header-player-wrapper { position: sticky; top: 0; z-index: 1000; background: #000; }
         .cat-scroll { 
-            display: flex; overflow-x: auto; gap: 10px; padding: 10px 15px; scrollbar-width: none; 
-            background: #000; position: sticky; top: 220px; z-index: 999; border-bottom: 1px solid #333;
+            display: flex; overflow-x: auto; gap: 10px; padding: 15px; scrollbar-width: none; 
+            background: #000; position: sticky; top: 220px; z-index: 999; border-bottom: 1px solid #222;
         }
+        .cat-scroll::-webkit-scrollbar { display: none; }
         
-        /* সূর্যের কিরণের মতো গ্লোয়িং ভাইব */
+        /* গ্লোয়িং ভাইব */
         .channel-card { 
-            min-width: 130px; padding: 15px; text-align: center; cursor: pointer;
+            padding: 15px; text-align: center; cursor: pointer;
             background: rgba(0, 0, 0, 0.8); border-radius: 15px;
-            box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.3); /* গ্লোয়িং ইফেক্ট */
+            box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.3);
             transition: 0.3s;
         }
         .active-cat { background: #ff0000 !important; color: white; }
+        
+        /* মেনু স্টাইল */
+        .menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; padding: 20px; }
     </style>
 </head>
 <body class="pb-24">
 
-    <!-- হেডার এবং প্লেয়ার (লকড) -->
     <div class="header-player-wrapper">
         <header class="p-4 flex justify-between items-center border-b border-red-900/30">
             <h1 class="text-red-600 font-bold text-2xl">NAHIDFLIX</h1>
-            <p class="text-[10px] text-red-600 italic">Powered By Kawsar Aziz</p>
+            <p style="font-family: cursive;" class="text-[10px] text-red-600">Powered By Kawsar Aziz</p>
         </header>
         <div class="aspect-video w-full">
             <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
     </div>
 
-    <!-- ক্যাটাগরি ট্যাব (লকড) -->
     <div class="cat-scroll" id="catBar"></div>
 
-    <!-- চ্যানেল গ্রিড -->
     <div id="channelGrid" class="grid grid-cols-2 gap-6 p-6 mt-2"></div>
 
-    <!-- ফুটার -->
-    <footer class="fixed bottom-0 w-full bg-black/90 p-4 flex justify-around items-center z-[1000]">
+    <footer class="fixed bottom-0 w-full bg-black/90 p-4 flex justify-around items-center z-[2000]">
         <button onclick="location.reload()"><i class="fas fa-home text-xl"></i></button>
         <input type="text" id="footerSearch" onkeyup="searchCh()" placeholder="Search..." class="w-2/3 bg-black py-2 px-4 rounded-full text-sm border border-red-900 outline-none">
         <button onclick="toggleSideMenu()"><i class="fas fa-bars text-xl"></i></button>
-    </footer>
-
-    <script>
-        let channels = [];
-        fetch('channels.json').then(r => r.json()).then(data => { channels = data; renderAll(); renderMenu(); });
-
-        function renderAll(data = channels, activeCat = 'All') {
-            document.getElementById('channelGrid').innerHTML = data.map(ch => `
-                <div class="channel-card" onclick="play('${ch.url}')">
-                    <img src="${ch.logo}" class="w-16 h-16 mx-auto rounded-full mb-3">
-                    <p class="text-xs font-bold truncate">${ch.name}</p>
-                </div>
-            `).join('');
-            
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.classList.toggle('active-cat', btn.innerText === activeCat);
-            });
-        }
-
-        // অটো-প্লে ফিক্সড
-        function play(url) { 
-            const player = document.getElementById('mainPlayer');
-            player.src = url.includes('?') ? url + "&autoplay=1" : url + "?autoplay=1"; 
-        }
         
-        function renderMenu() {
-            const cats = ['All', ...new Set(channels.map(c => c.category))];
-            document.getElementById('catBar').innerHTML = cats.map(c => 
-                `<button onclick="filter('${c}')" class="cat-btn px-5 py-2 bg-gray-900 rounded-full text-xs whitespace-nowrap shrink-0">${c}</button>`
-            ).join('');
-        }
-
-        function filter(cat) {
-            const filtered = (cat === 'All') ? channels : channels.filter(c => c.category === cat);
-            renderAll(filtered, cat);
-        }
-
-        function searchCh() {
-            const val = document.getElementById('footerSearch').value.toLowerCase();
-            renderAll(channels.filter(c => c.name.toLowerCase().includes(val)));
-        }
-
-        function toggleSideMenu() { 
-            document.getElementById('sideMenu')?.classList.toggle('hidden'); 
-        }
-    </script>
-</body>
-</html>

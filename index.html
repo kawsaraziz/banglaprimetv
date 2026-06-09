@@ -9,67 +9,48 @@
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; margin: 0; }
         
-        /* প্লেয়ার এবং ক্যাটাগরি ফিক্সড বা লক করার জন্য */
-        .sticky-header-player { 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-            background: #000; 
-        }
-        
+        /* লকিং সিস্টেম */
+        .header-player-wrapper { position: sticky; top: 0; z-index: 1000; background: #000; }
         .cat-scroll { 
-            display: flex; 
-            overflow-x: auto; 
-            gap: 10px; 
-            padding: 10px 15px; 
-            scrollbar-width: none; 
-            background: #000; 
-            position: sticky; 
-            top: 210px; /* প্লেয়ারের উচ্চতার উপর ভিত্তি করে */
-            z-index: 999; 
+            display: flex; overflow-x: auto; gap: 10px; padding: 10px 15px; scrollbar-width: none; 
+            background: #000; position: sticky; top: 220px; z-index: 999; border-bottom: 1px solid #333;
         }
         
-        .cat-scroll::-webkit-scrollbar { display: none; }
-        
-        .channel-card { min-width: 130px; padding: 15px; text-align: center; background: rgba(255, 0, 0, 0.1); border-radius: 12px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
-        .active-cat { background: #ff0000 !important; }
-        
-        /* মেনু স্টাইল */
-        .side-menu { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; padding: 20px; }
+        /* সূর্যের কিরণের মতো গ্লোয়িং ভাইব */
+        .channel-card { 
+            min-width: 130px; padding: 15px; text-align: center; cursor: pointer;
+            background: rgba(0, 0, 0, 0.8); border-radius: 15px;
+            box-shadow: 0 0 20px 5px rgba(255, 0, 0, 0.3); /* গ্লোয়িং ইফেক্ট */
+            transition: 0.3s;
+        }
+        .active-cat { background: #ff0000 !important; color: white; }
     </style>
 </head>
 <body class="pb-24">
 
-    <!-- হেডার এবং প্লেয়ার লকিং এরিয়া -->
-    <div class="sticky-header-player">
+    <!-- হেডার এবং প্লেয়ার (লকড) -->
+    <div class="header-player-wrapper">
         <header class="p-4 flex justify-between items-center border-b border-red-900/30">
             <h1 class="text-red-600 font-bold text-2xl">NAHIDFLIX</h1>
             <p class="text-[10px] text-red-600 italic">Powered By Kawsar Aziz</p>
         </header>
-        
         <div class="aspect-video w-full">
             <iframe id="mainPlayer" src="" class="w-full h-full" allow="autoplay; fullscreen" allowfullscreen></iframe>
         </div>
     </div>
 
-    <!-- ক্যাটাগরি ট্যাব -->
+    <!-- ক্যাটাগরি ট্যাব (লকড) -->
     <div class="cat-scroll" id="catBar"></div>
 
     <!-- চ্যানেল গ্রিড -->
-    <div id="channelGrid" class="grid grid-cols-2 gap-4 p-4"></div>
+    <div id="channelGrid" class="grid grid-cols-2 gap-6 p-6 mt-2"></div>
 
     <!-- ফুটার -->
-    <footer class="fixed bottom-0 w-full bg-black/80 backdrop-blur-md p-4 flex justify-around items-center z-[1000]">
+    <footer class="fixed bottom-0 w-full bg-black/90 p-4 flex justify-around items-center z-[1000]">
         <button onclick="location.reload()"><i class="fas fa-home text-xl"></i></button>
-        <input type="text" id="footerSearch" onkeyup="searchCh()" placeholder="Search..." class="w-2/3 bg-black/50 py-2 px-4 rounded-full text-sm border border-red-900/50 outline-none">
+        <input type="text" id="footerSearch" onkeyup="searchCh()" placeholder="Search..." class="w-2/3 bg-black py-2 px-4 rounded-full text-sm border border-red-900 outline-none">
         <button onclick="toggleSideMenu()"><i class="fas fa-bars text-xl"></i></button>
     </footer>
-
-    <!-- সাইড মেনু -->
-    <div id="sideMenu" class="side-menu">
-        <button onclick="toggleSideMenu()" class="text-3xl p-4"><i class="fas fa-times"></i></button>
-        <div id="menuCats" class="mt-10 p-4 space-y-6 text-xl"></div>
-    </div>
 
     <script>
         let channels = [];
@@ -88,16 +69,14 @@
             });
         }
 
-        function play(url) { document.getElementById('mainPlayer').src = url + "?autoplay=1"; }
-        
-        function toggleSideMenu() { 
-            const menu = document.getElementById('sideMenu');
-            menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        // অটো-প্লে ফিক্সড
+        function play(url) { 
+            const player = document.getElementById('mainPlayer');
+            player.src = url.includes('?') ? url + "&autoplay=1" : url + "?autoplay=1"; 
         }
-
+        
         function renderMenu() {
             const cats = ['All', ...new Set(channels.map(c => c.category))];
-            document.getElementById('menuCats').innerHTML = cats.map(c => `<div onclick="filter('${c}'); toggleSideMenu()">${c}</div>`).join('');
             document.getElementById('catBar').innerHTML = cats.map(c => 
                 `<button onclick="filter('${c}')" class="cat-btn px-5 py-2 bg-gray-900 rounded-full text-xs whitespace-nowrap shrink-0">${c}</button>`
             ).join('');
@@ -111,6 +90,10 @@
         function searchCh() {
             const val = document.getElementById('footerSearch').value.toLowerCase();
             renderAll(channels.filter(c => c.name.toLowerCase().includes(val)));
+        }
+
+        function toggleSideMenu() { 
+            document.getElementById('sideMenu')?.classList.toggle('hidden'); 
         }
     </script>
 </body>

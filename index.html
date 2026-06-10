@@ -2,82 +2,75 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Bongo Flex — বাংলার লাইভ টিভি</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
-    :root { --bg: #0a0a0f; --bg2: #111118; --bg3: #18181f; --red: #e50914; --text: #f0f0f5; --text3: #55556a; --border: #2a2a35; }
-    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+    :root { --bg: #0a0a0f; --bg2: #111118; --red: #e50914; --text: #fff; --border: #2a2a35; }
+    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 60px; }
     
-    /* হেডার ও সার্চ */
-    .navbar { display: flex; align-items: center; padding: 15px 20px; background: var(--bg2); border-bottom: 1px solid var(--border); }
-    .logo { font-weight: 800; font-size: 1.2rem; margin-right: 20px; }
-    .logo span { color: var(--red); }
-    .search-bar { flex: 1; padding: 10px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: white; }
-    
-    /* মেনু বা ফিল্টার */
-    .filter-menu { display: flex; gap: 10px; padding: 15px; overflow-x: auto; }
-    .filter-btn { padding: 8px 15px; background: var(--bg3); border-radius: 20px; cursor: pointer; border: none; color: white; }
-    
-    /* প্লেয়ার */
-    .player-section { background: #000; width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative; }
-    
-    /* গ্রিড */
-    .channel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; }
-    .card { background: var(--bg2); padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
-    .card img { width: 100%; border-radius: 6px; }
-    
-    /* ফুটার */
-    footer { text-align: center; padding: 20px; color: var(--text3); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 20px; }
+    /* Navbar & Search */
+    .navbar { display: flex; align-items: center; padding: 15px; background: var(--bg2); }
+    .logo { color: var(--red); font-weight: 800; font-size: 1.2rem; }
+    .search-box { flex: 1; margin-left: 15px; padding: 8px; border-radius: 20px; border: none; background: #222; color: #fff; }
+
+    /* Player */
+    .player-container { width: 100%; aspect-ratio: 16/9; background: #000; display: flex; justify-content: center; align-items: center; }
+    #video-player { width: 100%; height: 100%; }
+
+    /* Grid */
+    .channel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; }
+    .card { background: var(--bg2); padding: 5px; border-radius: 8px; text-align: center; font-size: 0.8rem; }
+    .card img { width: 100%; border-radius: 5px; }
+
+    /* Footer */
+    footer { text-align: center; padding: 20px; font-size: 0.7rem; color: #666; }
   </style>
 </head>
 <body>
 
   <div class="navbar">
-    <div class="logo">Bongo<span>Flex</span></div>
-    <input type="text" class="search-bar" placeholder="চ্যানেল খুঁজুন...">
+    <div class="logo">BongoFlex</div>
+    <input type="text" class="search-box" placeholder="চ্যানেল খুঁজুন...">
   </div>
 
-  <div class="player-section">
-    <iframe id="main-player" style="width:100%; height:100%; border:none; display:none;"></iframe>
-    <div id="placeholder" style="color:var(--text3);">ভিডিও প্লে করতে চ্যানেল ক্লিক করুন</div>
-  </div>
-
-  <div class="filter-menu">
-    <button class="filter-btn">সব</button>
-    <button class="filter-btn" style="background:var(--red);">Bangla</button>
-    <button class="filter-btn">News</button>
-    <button class="filter-btn">Sports</button>
+  <div class="player-container">
+    <video id="video-player" controls autoplay></video>
   </div>
 
   <div class="channel-grid" id="channel-grid"></div>
 
-  <footer>
-    "বাংলার জন্য, তোমার জন্য"<br>
-    © 2026 Bongo Flex - সব অধিকার সংরক্ষিত - Powered By Kawsar Aziz
-  </footer>
+  <footer>© 2026 Bongo Flex | Powered By Kawsar Aziz</footer>
 
 <script>
-  async function loadData() {
+  async function loadChannels() {
     try {
       const response = await fetch('channels.json');
-      const data = await response.json();
+      const channels = await response.json();
       const grid = document.getElementById('channel-grid');
-      
-      data.forEach(ch => {
+      const video = document.getElementById('video-player');
+
+      channels.forEach(ch => {
         const div = document.createElement('div');
         div.className = 'card';
-        div.innerHTML = `<img src="${ch.logo}"><div style="margin-top:10px; font-weight:600;">${ch.name}</div>`;
+        div.innerHTML = `<img src="${ch.logo}">${ch.name}`;
         div.onclick = () => {
-          const player = document.getElementById('main-player');
-          player.src = ch.stream_url;
-          player.style.display = 'block';
-          document.getElementById('placeholder').style.display = 'none';
+          // HLS Player Setup
+          if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(ch.stream_url);
+            hls.attachMedia(video);
+            video.play();
+          } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = ch.stream_url;
+            video.play();
+          }
         };
         grid.appendChild(div);
       });
-    } catch(e) { grid.innerHTML = 'চ্যানেল লোড করা সম্ভব হয়নি।'; }
+    } catch (e) { console.error("Error loading channels", e); }
   }
-  loadData();
+  loadChannels();
 </script>
 
 </body>

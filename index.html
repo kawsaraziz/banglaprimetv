@@ -2,734 +2,83 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bongo Flex — বাংলার লাইভ টিভি</title>
-  <meta name="description" content="বাংলার সেরা লাইভ টিভি স্ট্রিমিং। Bangla, Sports, News, Movies, Kids, Music সহ ৩০০+ চ্যানেল।" />
-  <meta name="theme-color" content="#0a0a0f" />
-
-  <!-- PWA / Installable -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Bongo Flex" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Bongo Flex — বাংলার লাইভ টিভি" />
-  <meta property="og:description" content="বাংলার সেরা লাইভ টিভি স্ট্রিমিং। ৩০০+ চ্যানেল এখন আপনার হাতের মুঠোয়।" />
-  <meta property="og:type" content="website" />
-
-  <!-- HLS.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.4.10/hls.min.js"></script>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet" />
-
   <style>
-    /* ── RESET & BASE ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #0a0a0f;
-      --surface: #13131a;
-      --surface2: #1c1c26;
-      --surface3: #252532;
-      --border: #2a2a38;
-      --accent: #e8412a;
-      --accent2: #ff6b35;
-      --text: #f0f0f5;
-      --text2: #9494a8;
-      --text3: #5a5a72;
-      --green: #22c55e;
-      --sidebar-w: 320px;
-      --nav-h: 56px;
-      --bottom-h: 64px;
-      --radius: 10px;
-    }
-    html { height: 100%; }
-    body {
-      font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100%;
-      overflow: hidden;
-    }
-    button { cursor: pointer; border: none; background: none; font-family: inherit; }
-    input { font-family: inherit; }
-    a { text-decoration: none; color: inherit; }
-    img { display: block; }
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-
-    /* ── LAYOUT ── */
-    #app {
-      display: grid;
-      grid-template-rows: var(--nav-h) 1fr;
-      grid-template-columns: var(--sidebar-w) 1fr;
-      height: 100vh;
-      height: 100dvh;
-    }
-    /* Mobile: stack vertically */
-    @media (max-width: 768px) {
-      #app {
-        grid-template-rows: var(--nav-h) 1fr var(--bottom-h);
-        grid-template-columns: 1fr;
-        overflow: hidden;
-      }
-    }
-
-    /* ── TOP NAV ── */
-    #topnav {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 16px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      z-index: 100;
-      position: relative;
-    }
-    .logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-    .logo-icon {
-      width: 34px; height: 34px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
-    }
-    .logo-text {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-    .logo-text span { color: var(--accent); }
-    .logo-slogan {
-      font-size: 10px;
-      color: var(--text3);
-      font-weight: 400;
-      display: none;
-    }
-    @media (min-width: 480px) { .logo-slogan { display: block; } }
-
-    #search-bar {
-      flex: 1;
-      max-width: 400px;
-      margin: 0 auto;
-      position: relative;
-    }
-    #search-input {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 8px 16px 8px 38px;
-      color: var(--text);
-      font-size: 13px;
-      outline: none;
-      transition: border-color .2s;
-    }
-    #search-input:focus { border-color: var(--accent); }
-    #search-input::placeholder { color: var(--text3); }
-    .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text3);
-      font-size: 14px;
-      pointer-events: none;
-    }
-
-    /* install button */
-    #install-btn {
-      padding: 7px 14px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: opacity .2s, transform .15s;
-      flex-shrink: 0;
-      display: none;
-    }
-    #install-btn:hover { opacity: .9; transform: scale(1.03); }
-    #install-btn.visible { display: flex; align-items: center; gap: 6px; }
-
-    /* ── SIDEBAR ── */
-    #sidebar {
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    @media (max-width: 768px) {
-      #sidebar {
-        position: fixed;
-        inset: var(--nav-h) 0 var(--bottom-h) 0;
-        z-index: 50;
-        border-right: none;
-        transform: translateX(-100%);
-        transition: transform .3s ease;
-      }
-      #sidebar.open { transform: translateX(0); }
-    }
-
-    /* category tabs */
-    #cat-tabs {
-      display: flex;
-      gap: 4px;
-      padding: 10px 10px 8px;
-      overflow-x: auto;
-      flex-shrink: 0;
-      scrollbar-width: none;
-    }
-    #cat-tabs::-webkit-scrollbar { display: none; }
-    .cat-tab {
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text2);
-      background: var(--surface2);
-      border: 1px solid transparent;
-      white-space: nowrap;
-      transition: all .15s;
-    }
-    .cat-tab.active, .cat-tab:hover {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-
-    /* channel list */
-    #channel-list {
-      flex: 1;
-      overflow-y: auto;
-      padding: 4px 0;
-    }
-    .channel-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
-      cursor: pointer;
-      border-radius: var(--radius);
-      margin: 2px 6px;
-      transition: background .15s;
-      position: relative;
-    }
-    .channel-item:hover { background: var(--surface2); }
-    .channel-item.active {
-      background: rgba(232, 65, 42, 0.15);
-      border: 1px solid rgba(232, 65, 42, .3);
-    }
-    .channel-item.active .ch-name { color: var(--accent); }
-    .ch-logo {
-      width: 38px; height: 38px;
-      border-radius: 8px;
-      background: var(--surface3);
-      object-fit: contain;
-      flex-shrink: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text3);
-    }
-    .ch-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; }
-    .ch-info { flex: 1; min-width: 0; }
-    .ch-name {
-      font-size: 13px;
-      font-weight: 500;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .ch-cat {
-      font-size: 11px;
-      color: var(--text3);
-      margin-top: 1px;
-    }
-    .ch-live {
-      font-size: 10px;
-      background: var(--green);
-      color: #000;
-      padding: 2px 6px;
-      border-radius: 10px;
-      font-weight: 700;
-      flex-shrink: 0;
-      display: none;
-    }
-    .channel-item.active .ch-live { display: block; }
-    .fav-btn {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px;
-      color: var(--text3);
-      flex-shrink: 0;
-      transition: color .15s;
-    }
-    .fav-btn:hover, .fav-btn.active { color: #f59e0b; }
-
-    .channel-count {
-      padding: 6px 14px;
-      font-size: 11px;
-      color: var(--text3);
-      flex-shrink: 0;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-
-    /* ── MAIN PLAYER AREA ── */
-    #main {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: var(--bg);
-    }
-    @media (max-width: 768px) {
-      #main { overflow-y: auto; }
-    }
-
-    /* player wrapper */
-    #player-wrap {
-      position: relative;
-      background: #000;
-      flex-shrink: 0;
-    }
-    /* 16:9 aspect */
-    #player-wrap::before {
-      content: '';
-      display: block;
-      padding-top: 56.25%;
-    }
-    #video-el {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      object-fit: contain;
-    }
-    #player-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .idle-screen {
-      text-align: center;
-      padding: 24px;
-    }
-    .idle-logo {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-    .idle-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .idle-sub {
-      font-size: 14px;
-      color: var(--text2);
-    }
-
-    /* loading spinner */
-    #loading-spinner {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.6);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 14px;
-    }
-    #loading-spinner.show { display: flex; }
-    .spinner {
-      width: 44px; height: 44px;
-      border: 3px solid rgba(255,255,255,.15);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-ch { font-size: 14px; color: var(--text2); }
-
-    /* error overlay */
-    #error-overlay {
-      display: none;
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.7);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-      text-align: center;
-      padding: 24px;
-    }
-    #error-overlay.show { display: flex; }
-    .err-icon { font-size: 40px; }
-    .err-title { font-size: 16px; font-weight: 600; }
-    .err-sub { font-size: 13px; color: var(--text2); }
-    .retry-btn {
-      padding: 9px 22px;
-      background: var(--accent);
-      color: #fff;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-top: 8px;
-      transition: opacity .2s;
-    }
-    .retry-btn:hover { opacity: .85; }
-
-    /* now playing bar */
-    #now-playing {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .np-logo {
-      width: 36px; height: 36px;
-      border-radius: 7px;
-      background: var(--surface2);
-      object-fit: contain;
-      flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; color: var(--text3); font-weight: 700;
-      overflow: hidden;
-    }
-    .np-logo img { width: 100%; height: 100%; object-fit: contain; }
-    .np-info { flex: 1; min-width: 0; }
-    .np-name { font-size: 14px; font-weight: 600; }
-    .np-cat { font-size: 12px; color: var(--text3); }
-    .np-live {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 12px; font-weight: 600; color: var(--green);
-      flex-shrink: 0;
-    }
-    .live-dot {
-      width: 7px; height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 1.2s infinite;
-    }
-    @keyframes pulse {
-      0%,100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .np-placeholder { color: var(--text3); font-size: 13px; }
-
-    /* fullscreen btn */
-    #fullscreen-btn {
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: var(--surface2);
-      color: var(--text2);
-      font-size: 16px;
-      transition: background .15s;
-      flex-shrink: 0;
-    }
-    #fullscreen-btn:hover { background: var(--surface3); color: var(--text); }
-
-    /* ── BROWSE GRID (desktop) ── */
-    #browse-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: none;
-    }
-    @media (min-width: 769px) {
-      #browse-area { display: block; }
-    }
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: .8px;
-      margin-bottom: 10px;
-    }
-    .grid-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .grid-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 10px 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all .15s;
-    }
-    .grid-card:hover {
-      border-color: var(--accent);
-      background: var(--surface2);
-      transform: translateY(-1px);
-    }
-    .grid-card.active {
-      border-color: var(--accent);
-      background: rgba(232,65,42,.12);
-    }
-    .grid-logo {
-      width: 48px; height: 48px;
-      border-radius: 8px;
-      background: var(--surface2);
-      margin: 0 auto 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: var(--text3);
-      overflow: hidden;
-    }
-    .grid-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; }
-    .grid-name {
-      font-size: 11px;
-      font-weight: 500;
-      line-height: 1.3;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
-
-    /* ── BOTTOM NAV (mobile) ── */
-    #bottom-nav {
-      display: none;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    @media (max-width: 768px) { #bottom-nav { display: flex; } }
-    .bnav-items {
-      display: flex;
-      width: 100%;
-    }
-    .bnav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      padding: 8px 4px;
-      font-size: 10px;
-      color: var(--text3);
-      transition: color .15s;
-    }
-    .bnav-item.active { color: var(--accent); }
-    .bnav-icon { font-size: 20px; line-height: 1; }
-
-    /* sidebar overlay for mobile */
-    #sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.6);
-      z-index: 49;
-    }
-    @media (max-width: 768px) {
-      #sidebar-overlay.show { display: block; }
-    }
-
-    /* ── TOAST ── */
-    #toast {
-      position: fixed;
-      bottom: 80px;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--surface3);
-      color: var(--text);
-      padding: 9px 18px;
-      border-radius: 24px;
-      font-size: 13px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .3s, transform .3s;
-      z-index: 200;
-      white-space: nowrap;
-    }
-    #toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    @media (min-width: 769px) {
-      #toast { bottom: 30px; }
-    }
-
-    /* ── INSTALL BANNER ── */
-    #install-banner {
-      display: none;
-      position: fixed;
-      bottom: 80px;
-      left: 12px; right: 12px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px 16px;
-      z-index: 300;
-      box-shadow: 0 8px 32px rgba(0,0,0,.5);
-    }
-    #install-banner.show { display: flex; align-items: center; gap: 12px; }
-    .banner-icon { font-size: 32px; flex-shrink: 0; }
-    .banner-info { flex: 1; min-width: 0; }
-    .banner-title { font-size: 14px; font-weight: 600; }
-    .banner-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
-    .banner-btns { display: flex; gap: 8px; flex-shrink: 0; }
-    .banner-install {
-      padding: 7px 14px;
-      background: var(--accent);
-      color: #fff;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .banner-dismiss {
-      padding: 7px 10px;
-      background: var(--surface3);
-      color: var(--text2);
-      border-radius: 20px;
-      font-size: 12px;
-    }
-    @media (min-width: 769px) { #install-banner { bottom: 30px; max-width: 460px; left: 50%; transform: translateX(-50%); } }
-
-    /* ── FOOTER ── */
-    #footer {
-      flex-shrink: 0;
-      padding: 8px 16px;
-      text-align: center;
-      font-size: 11px;
-      color: var(--text3);
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-      display: none;
-    }
-    @media (min-width: 769px) { #footer { display: block; } }
-    #footer a { color: var(--accent); }
-
-    /* Favorites / Recent views */
-    #view-favorites, #view-recent {
-      display: none;
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-    }
-    .empty-icon { font-size: 40px; margin-bottom: 10px; }
-    .empty-text { color: var(--text2); font-size: 14px; }
-    .fav-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    /* Loading initial */
-    #init-loader {
-      position: fixed;
-      inset: 0;
-      background: var(--bg);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      z-index: 999;
-      transition: opacity .4s;
-    }
-    #init-loader.hide { opacity: 0; pointer-events: none; }
-    .init-logo { font-size: 56px; }
-    .init-name { font-size: 28px; font-weight: 700; }
-    .init-name span { color: var(--accent); }
-    .init-bar {
-      width: 200px; height: 3px;
-      background: var(--surface2);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .init-progress {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border-radius: 4px;
-      animation: load 1.2s ease forwards;
-    }
-    @keyframes load {
-      from { width: 0; }
-      to { width: 100%; }
-    }
+    :root { --bg: #0a0a0f; --bg2: #111118; --bg3: #18181f; --red: #e50914; --text: #f0f0f5; --text3: #55556a; --border: #2a2a35; }
+    body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+    
+    /* হেডার ও সার্চ */
+    .navbar { display: flex; align-items: center; padding: 15px 20px; background: var(--bg2); border-bottom: 1px solid var(--border); }
+    .logo { font-weight: 800; font-size: 1.2rem; margin-right: 20px; }
+    .logo span { color: var(--red); }
+    .search-bar { flex: 1; padding: 10px; border-radius: 20px; background: var(--bg3); border: 1px solid var(--border); color: white; }
+    
+    /* মেনু বা ফিল্টার */
+    .filter-menu { display: flex; gap: 10px; padding: 15px; overflow-x: auto; }
+    .filter-btn { padding: 8px 15px; background: var(--bg3); border-radius: 20px; cursor: pointer; border: none; color: white; }
+    
+    /* প্লেয়ার */
+    .player-section { background: #000; width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; position: relative; }
+    
+    /* গ্রিড */
+    .channel-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 15px; }
+    .card { background: var(--bg2); padding: 10px; border-radius: 10px; border: 1px solid var(--border); }
+    .card img { width: 100%; border-radius: 6px; }
+    
+    /* ফুটার */
+    footer { text-align: center; padding: 20px; color: var(--text3); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 20px; }
   </style>
 </head>
 <body>
 
-<!-- Init Loader -->
-<div id="init-loader">
-  <div class="init-logo">📺</div>
-  <div class="init-name">Bongo<span>Flex</span></div>
-  <div class="init-bar"><div class="init-progress"></div></div>
-</div>
-
-<!-- Toast -->
-<div id="toast"></div>
-
-<!-- Install Banner -->
-<div id="install-banner">
-  <div class="banner-icon">📲</div>
-  <div class="banner-info">
-    <div class="banner-title">Bongo Flex ইনস্টল করুন</div>
-    <div class="banner-sub">হোম স্ক্রিনে অ্যাপের মতো ব্যবহার করুন</div>
+  <div class="navbar">
+    <div class="logo">Bongo<span>Flex</span></div>
+    <input type="text" class="search-bar" placeholder="চ্যানেল খুঁজুন...">
   </div>
-  <div class="banner-btns">
-    <button class="banner-install" id="banner-install-btn">ইনস্টল</button>
-    <button class="banner-dismiss" id="banner-dismiss-btn">✕</button>
+
+  <div class="player-section">
+    <iframe id="main-player" style="width:100%; height:100%; border:none; display:none;"></iframe>
+    <div id="placeholder" style="color:var(--text3);">ভিডিও প্লে করতে চ্যানেল ক্লিক করুন</div>
   </div>
-</div>
 
-<!-- Sidebar Overlay -->
-<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <div class="filter-menu">
+    <button class="filter-btn">সব</button>
+    <button class="filter-btn" style="background:var(--red);">Bangla</button>
+    <button class="filter-btn">News</button>
+    <button class="filter-btn">Sports</button>
+  </div>
 
-<!-- APP -->
-<div id="app">
+  <div class="channel-grid" id="channel-grid"></div>
 
-  <!-- TOP NAV -->
-  <nav id="topnav">
-    <div class="logo-wrap">
-      <div class="logo-icon">📺</div>
-      <div>
-        <div class="logo-text">Bongo<span>Flex</span></div>
-        <div class="logo-slogan">বাংলার গল্প, সারা দুনিয়ায়</div>
-      </div>
-    </div>
+  <footer>
+    "বাংলার জন্য, তোমার জন্য"<br>
+    © 2026 Bongo Flex - সব অধিকার সংরক্ষিত - Powered By Kawsar Aziz
+  </footer>
 
-    <div id="search-bar">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="search-input" placeholder="চ্যানেল খুঁজুন..." autocomplete="off" />
-    </div>
+<script>
+  async function loadData() {
+    try {
+      const response = await fetch('channels.json');
+      const data = await response.json();
+      const grid = document.getElementById('channel-grid');
+      
+      data.forEach(ch => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `<img src="${ch.logo}"><div style="margin-top:10px; font-weight:600;">${ch.name}</div>`;
+        div.onclick = () => {
+          const player = document.getElementById('main-player');
+          player.src = ch.stream_url;
+          player.style.display = 'block';
+          document.getElementById('placeholder').style.display = 'none';
+        };
+        grid.appendChild(div);
+      });
+    } catch(e) { grid.innerHTML = 'চ্যানেল লোড করা সম্ভব হয়নি।'; }
+  }
+  loadData();
+</script>
 
-    <button id="install-
+</body>
+</html>

@@ -6,6 +6,24 @@
     "url": "https://tvsen7.aynaott.com/tsports-hd/index.m3u8?e=1781099578&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=a81b0d2b5b6c662b7723c22e643fe9bb"
   },
   {
+    "name": "Telemundo",
+    "category": "Sports",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/6/68/Telemundo_logo_2018.svg",
+    "url": "https://nbculocallive.akamaized.net/hls/live/2037499/puertorico/stream1/master.m3u8"
+  },
+  {
+    "name": "T Sports HD",
+    "category": "Sports",
+    "logo": "https://s3.aynaott.com/storage/dbc585f70a60b9855b6e13a8ce4cb6f4",
+    "url": "https://tvsen7.aynaott.com/tsports-hd/index.m3u8?e=1781099578&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=a81b0d2b5b6c662b7723c22e643fe9bb"
+  },
+  {
+    "name": "T Sports HD",
+    "category": "Sports",
+    "logo": "https://s3.aynaott.com/storage/dbc585f70a60b9855b6e13a8ce4cb6f4",
+    "url": "https://tvsen7.aynaott.com/tsports-hd/index.m3u8?e=1781099578&u=78be6644-0a65-48ec-81a4-089ac65a2619&token=a81b0d2b5b6c662b7723c22e643fe9bb"
+  },
+  {
     "name": "BTV",
     "category": "Entertainment",
     "logo": "https://tstatic.akash-go.com/cms-ui/images/custom-content/1778082545894.png",
